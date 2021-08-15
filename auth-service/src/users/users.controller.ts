@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UsersService } from './users.service';
 
@@ -12,8 +13,8 @@ export class UsersController {
   }
 
   @Post('sign-in')
-  async signIn() {
-    return this.usersService.signIn();
+  async signIn(@Body() signInDto: SignInDto) {
+    return this.usersService.signIn(signInDto);
   }
 
   @Post('sign-out')

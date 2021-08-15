@@ -8,11 +8,11 @@ import { User, UserDocument } from '../schemas/user.schema';
 export class UsersRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async findByEmail(email: string): Promise<User> {
+  async findByEmail(email: string): Promise<UserDocument> {
     return this.userModel.findOne({ email });
   }
 
-  async create(signUpDto: SignUpDto): Promise<User> {
+  async create(signUpDto: SignUpDto): Promise<UserDocument> {
     const user = new this.userModel(signUpDto);
     return user.save();
   }
