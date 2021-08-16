@@ -8,7 +8,6 @@ import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { HashService } from './hash/hash.service';
 import { UsersRepository } from './repositories/users.repository';
-import { User } from './schemas/user.schema';
 
 @Injectable()
 export class UsersService {
@@ -18,11 +17,13 @@ export class UsersService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async showUserInfo() {
-    return 'OK';
+  private async generateToken(id: string): Promise<string> {
+    const token = this.jwtService.sign({ id });
+
+    return token;
   }
 
-  async signIn(signInDto: SignInDto): Promise<{ token: string }> {
+  async signIn(signInDto: SignInDto): Promise<string> {
     const { email, password } = signInDto;
 
     const user = await this.usersRepository.findByEmail(email);
@@ -31,16 +32,10 @@ export class UsersService {
       throw new UnauthorizedException('E-mail or password is invalid');
     }
 
-    const token = this.jwtService.sign({ id: user._id });
-
-    return { token };
+    return this.generateToken(user._id);
   }
 
-  async signOut() {
-    return 'OK';
-  }
-
-  async signUp(signUpDto: SignUpDto): Promise<User> {
+  async signUp(signUpDto: SignUpDto): Promise<string> {
     const { email } = signUpDto;
 
     const emailAlreadyExists = await this.usersRepository.findByEmail(email);
@@ -51,6 +46,14 @@ export class UsersService {
 
     const user = await this.usersRepository.create(signUpDto);
 
-    return user;
+    return this.generateToken(user._id);
+  }
+
+  async showUserInfo() {
+    return 'OK';
+  }
+
+  async signOut() {
+    return 'OK';
   }
 }

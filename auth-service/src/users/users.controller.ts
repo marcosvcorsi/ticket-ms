@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UsersService } from './users.service';
@@ -7,14 +8,30 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get('me')
-  async showUserInfo() {
-    return this.usersService.showUserInfo();
+  private setAuthCookie(response: Response, token: string) {
+    response.cookie('jwt', token);
   }
 
   @Post('sign-in')
-  async signIn(@Body() signInDto: SignInDto) {
-    return this.usersService.signIn(signInDto);
+  async signIn(
+    @Body() signInDto: SignInDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return this.setAuthCookie(
+      response,
+      await this.usersService.signIn(signInDto),
+    );
+  }
+
+  @Post('sign-up')
+  async signUp(
+    @Body() signUpDto: SignUpDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return this.setAuthCookie(
+      response,
+      await this.usersService.signUp(signUpDto),
+    );
   }
 
   @Post('sign-out')
@@ -22,8 +39,8 @@ export class UsersController {
     return this.usersService.signOut();
   }
 
-  @Post('sign-up')
-  async signUp(@Body() signUpDto: SignUpDto) {
-    return this.usersService.signUp(signUpDto);
+  @Get('me')
+  async showUserInfo() {
+    return this.usersService.showUserInfo();
   }
 }
