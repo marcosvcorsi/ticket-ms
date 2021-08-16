@@ -14,6 +14,12 @@ spec:
       containers:
       - name: auth
         image: mvcorsi/auth-service
+        env:
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: jwt-secret
+                key: JWT_KEY
 ---
 apiVersion: v1
 kind: Service
