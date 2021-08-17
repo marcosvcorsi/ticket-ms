@@ -27,7 +27,7 @@ export class UsersController {
 
     response.cookie('jwt', signResponse.token);
 
-    return response.send(signResponse);
+    return signResponse;
   }
 
   @Post('sign-up')
@@ -39,12 +39,15 @@ export class UsersController {
 
     response.cookie('jwt', token);
 
-    return response.send(user);
+    return user;
   }
 
   @Post('sign-out')
-  async signOut() {
-    return this.usersService.signOut();
+  @HttpCode(HttpStatus.OK)
+  async signOut(@Res() response: Response) {
+    response.clearCookie('jwt');
+
+    return response.send();
   }
 
   @Get('me')

@@ -80,8 +80,4 @@ export class UsersService {
       return new UnauthorizedException('Invalid token');
     }
   }
-
-  async signOut() {
-    return 'OK';
-  }
 }
