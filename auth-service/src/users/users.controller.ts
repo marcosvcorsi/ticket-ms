@@ -5,9 +5,10 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Res,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UsersService } from './users.service';
@@ -47,7 +48,9 @@ export class UsersController {
   }
 
   @Get('me')
-  async showUserInfo() {
-    return this.usersService.showUserInfo();
+  async showUserInfo(@Req() request: Request) {
+    const token = request.cookies['jwt'];
+
+    return this.usersService.showUserInfo(token);
   }
 }

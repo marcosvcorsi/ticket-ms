@@ -65,8 +65,20 @@ export class UsersService {
     };
   }
 
-  async showUserInfo() {
-    return 'OK';
+  async showUserInfo(token: string) {
+    if (!token) {
+      return new BadRequestException('token is not provided');
+    }
+
+    try {
+      const { id } = await this.jwtService.verify(token);
+
+      const user = await this.usersRepository.findById(id);
+
+      return User.fromDocument(user);
+    } catch {
+      return new UnauthorizedException('Invalid token');
+    }
   }
 
   async signOut() {

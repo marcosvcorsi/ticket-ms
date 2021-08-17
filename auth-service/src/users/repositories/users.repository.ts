@@ -16,4 +16,8 @@ export class UsersRepository {
     const user = new this.userModel(signUpDto);
     return user.save();
   }
+
+  async findById(id: string): Promise<UserDocument> {
+    return this.userModel.findById(id);
+  }
 }
