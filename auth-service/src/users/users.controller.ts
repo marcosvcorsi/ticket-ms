@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -8,19 +16,17 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  private setAuthCookie(response: Response, token: string) {
-    response.cookie('jwt', token);
-  }
-
   @Post('sign-in')
+  @HttpCode(HttpStatus.OK)
   async signIn(
     @Body() signInDto: SignInDto,
     @Res({ passthrough: true }) response: Response,
   ) {
-    return this.setAuthCookie(
-      response,
-      await this.usersService.signIn(signInDto),
-    );
+    const signResponse = await this.usersService.signIn(signInDto);
+
+    response.cookie('jwt', signResponse.token);
+
+    return response.send(signResponse);
   }
 
   @Post('sign-up')
@@ -28,10 +34,11 @@ export class UsersController {
     @Body() signUpDto: SignUpDto,
     @Res({ passthrough: true }) response: Response,
   ) {
-    return this.setAuthCookie(
-      response,
-      await this.usersService.signUp(signUpDto),
-    );
+    const { token, user } = await this.usersService.signUp(signUpDto);
+
+    response.cookie('jwt', token);
+
+    return response.send(user);
   }
 
   @Post('sign-out')

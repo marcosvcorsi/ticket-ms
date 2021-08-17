@@ -7,7 +7,13 @@ import { JwtService } from '@nestjs/jwt';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { HashService } from './hash/hash.service';
+import { User } from './models/user.model';
 import { UsersRepository } from './repositories/users.repository';
+
+type SignResponse = {
+  token?: string;
+  user: User;
+};
 
 @Injectable()
 export class UsersService {
@@ -18,12 +24,12 @@ export class UsersService {
   ) {}
 
   private async generateToken(id: string): Promise<string> {
-    const token = this.jwtService.sign({ id });
+    const token = await this.jwtService.sign({ id });
 
     return token;
   }
 
-  async signIn(signInDto: SignInDto): Promise<string> {
+  async signIn(signInDto: SignInDto): Promise<SignResponse> {
     const { email, password } = signInDto;
 
     const user = await this.usersRepository.findByEmail(email);
@@ -32,10 +38,15 @@ export class UsersService {
       throw new UnauthorizedException('E-mail or password is invalid');
     }
 
-    return this.generateToken(user._id);
+    const token = await this.generateToken(user._id);
+
+    return {
+      token,
+      user: User.fromDocument(user),
+    };
   }
 
-  async signUp(signUpDto: SignUpDto): Promise<string> {
+  async signUp(signUpDto: SignUpDto): Promise<SignResponse> {
     const { email } = signUpDto;
 
     const emailAlreadyExists = await this.usersRepository.findByEmail(email);
@@ -46,7 +57,12 @@ export class UsersService {
 
     const user = await this.usersRepository.create(signUpDto);
 
-    return this.generateToken(user._id);
+    const token = await this.generateToken(user._id);
+
+    return {
+      token,
+      user: User.fromDocument(user),
+    };
   }
 
   async showUserInfo() {
