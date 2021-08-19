@@ -67,7 +67,7 @@ export class UsersService {
 
   async showUserInfo(token: string) {
     if (!token) {
-      return new BadRequestException('token is not provided');
+      throw new BadRequestException('token is not provided');
     }
 
     try {
@@ -77,7 +77,7 @@ export class UsersService {
 
       return User.fromDocument(user);
     } catch {
-      return new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException('Invalid token');
     }
   }
 }
