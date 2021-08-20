@@ -44,7 +44,9 @@ describe('UsersController (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
         MongooseModule.forRoot(databaseUrl),
-        ConfigModule.forRoot(),
+        ConfigModule.forRoot({
+          envFilePath: '.env.test',
+        }),
         UsersModule,
       ],
     }).compile();
