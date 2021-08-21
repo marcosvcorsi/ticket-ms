@@ -16,4 +16,11 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-  
+    - image: mvcorsi/web
+      context: web
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: '**/*.js'
+            dest: .
