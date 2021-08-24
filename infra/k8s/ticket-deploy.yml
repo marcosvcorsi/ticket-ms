@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticket-deploy
+spec:
+  selector:
+    matchLabels:
+      app: ticket
+  template:
+    metadata:
+      labels:
+        app: ticket
+    spec:
+      containers:
+      - name: ticket
+        image: mvcorsi/ticket-service
+        env:
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: jwt-secret
+                key: JWT_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticket-service
+spec:
+  selector:
+    app: ticket
+  ports:
+  - port: 3000
+    protocol: TCP
+    targetPort: 3000
+
+
