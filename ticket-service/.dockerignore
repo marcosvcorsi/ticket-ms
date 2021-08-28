@@ -1,0 +1,8 @@
+.git
+dist
+node_nodules
+test
+.env
+.env.example.
+.env.local
+.env.test
