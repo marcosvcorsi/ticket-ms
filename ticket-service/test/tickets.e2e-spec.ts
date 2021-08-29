@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { TicketsModule } from '../src/tickets/tickets.module';
 import { MongoMemoryServer } from 'mongodb-memory-server';
@@ -19,8 +19,14 @@ describe('TicketsController (e2e)', () => {
 
   let app: INestApplication;
 
+  let title: string;
+  let price: number;
+
   beforeAll(async () => {
     mongo = await MongoMemoryServer.create();
+
+    title = 'any_title';
+    price = 10;
   });
 
   beforeEach(async () => {
@@ -77,10 +83,16 @@ describe('TicketsController (e2e)', () => {
 
       const response = await request(app.getHttpServer())
         .post('/tickets')
-        .send()
+        .send({
+          title,
+          price,
+        })
         .set('cookie', `jwt=${token}`);
 
       expect(response.status).toBe(201);
+      expect(response.body.id).toBeDefined();
+      expect(response.body.title).toBe(title);
+      expect(response.body.price).toBe(price);
     });
   });
 });

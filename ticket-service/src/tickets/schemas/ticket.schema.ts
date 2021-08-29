@@ -4,6 +4,12 @@ import { Document } from 'mongoose';
 export type TicketDocument = Ticket & Document;
 
 @Schema()
-export class Ticket {}
+export class Ticket {
+  @Prop()
+  title: string;
+
+  @Prop()
+  price: number;
+}
 
 export const TicketSchema = SchemaFactory.createForClass(Ticket);
