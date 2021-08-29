@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateTicketDto } from './dtos/create-ticket.dto';
 import { TicketsService } from './tickets.service';
@@ -9,9 +9,15 @@ export class TicketsController {
   constructor(private readonly ticketsService: TicketsService) {}
 
   @Post()
-  async createTicket(@Body() createTicketDto: CreateTicketDto) {
-    console.log(createTicketDto);
+  async createTicket(
+    @Body() createTicketDto: CreateTicketDto,
+    @Request() request,
+  ) {
+    const { id: userId } = request.user;
 
-    return this.ticketsService.create(createTicketDto);
+    return this.ticketsService.create({
+      userId,
+      ...createTicketDto,
+    });
   }
 }

@@ -21,12 +21,14 @@ describe('TicketsController (e2e)', () => {
 
   let title: string;
   let price: number;
+  let userId: string;
 
   beforeAll(async () => {
     mongo = await MongoMemoryServer.create();
 
     title = 'any_title';
     price = 10;
+    userId = 'any_user_id';
   });
 
   beforeEach(async () => {
@@ -79,7 +81,7 @@ describe('TicketsController (e2e)', () => {
     });
 
     it('should return 201 with created ticket', async () => {
-      const token = await jwtService.sign({ id: 'any_id' });
+      const token = await jwtService.sign({ id: userId });
 
       const response = await request(app.getHttpServer())
         .post('/tickets')
@@ -93,6 +95,7 @@ describe('TicketsController (e2e)', () => {
       expect(response.body.id).toBeDefined();
       expect(response.body.title).toBe(title);
       expect(response.body.price).toBe(price);
+      expect(response.body.userId).toBe(userId);
     });
   });
 });
