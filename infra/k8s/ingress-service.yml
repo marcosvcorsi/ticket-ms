@@ -17,6 +17,13 @@ spec:
                 name: auth-service
                 port:
                   number: 3000
+          - path: /api/tickets/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: ticket-service
+                port:
+                  number: 3000        
           - path: /?(.*)
             pathType: Prefix
             backend:
