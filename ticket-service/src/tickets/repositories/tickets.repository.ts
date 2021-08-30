@@ -15,4 +15,8 @@ export class TicketsRepository {
 
     return createdTicket.save();
   }
+
+  async findById(id: string): Promise<TicketDocument> {
+    return this.ticketModel.findById(id);
+  }
 }

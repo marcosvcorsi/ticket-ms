@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateTicketDto } from './dtos/create-ticket.dto';
 import { TicketsService } from './tickets.service';
@@ -19,5 +27,10 @@ export class TicketsController {
       userId,
       ...createTicketDto,
     });
+  }
+
+  @Get(':id')
+  async findById(@Param('id') id: string) {
+    return this.ticketsService.findById(id);
   }
 }

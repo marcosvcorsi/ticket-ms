@@ -10,12 +10,14 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from '../src/shared/strategies/jwt.strategy';
 import * as cookieParser from 'cookie-parser';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { TicketsRepository } from '../src/tickets/repositories/tickets.repository';
 
 describe('TicketsController (e2e)', () => {
   let mongo: MongoMemoryServer;
   let connection: mongoose.Connection;
 
   let jwtService: JwtService;
+  let ticketsRepository: TicketsRepository;
 
   let app: INestApplication;
 
@@ -59,11 +61,13 @@ describe('TicketsController (e2e)', () => {
     await app.init();
 
     jwtService = app.get(JwtService);
+    ticketsRepository = app.get(TicketsRepository);
 
     connection = await moduleFixture.get(getConnectionToken());
   });
 
   afterEach(async () => {
+    await connection.dropDatabase();
     await connection.close(true);
   });
 
@@ -96,6 +100,45 @@ describe('TicketsController (e2e)', () => {
       expect(response.body.title).toBe(title);
       expect(response.body.price).toBe(price);
       expect(response.body.userId).toBe(userId);
+    });
+  });
+
+  describe('GET /tickets/:id', () => {
+    it('should return 401 when token is not provided', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/tickets/any_id')
+        .send();
+
+      expect(response.status).toBe(401);
+    });
+
+    it('should return 404 when ticket not found', async () => {
+      const token = await jwtService.sign({ id: userId });
+
+      const response = await request(app.getHttpServer())
+        .get('/tickets/612c35e39eaca555a48cd08d')
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(404);
+    });
+
+    it('should return 200 with ticket', async () => {
+      const token = await jwtService.sign({ id: userId });
+
+      const ticket = await ticketsRepository.create({
+        title,
+        price,
+        userId,
+      });
+
+      const response = await request(app.getHttpServer())
+        .get(`/tickets/${ticket._id}`)
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.id).toBe(ticket._id.toString());
+      expect(response.body.title).toBe(ticket.title);
+      expect(response.body.price).toBe(ticket.price);
     });
   });
 });
