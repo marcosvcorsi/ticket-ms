@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { UpdateTicketDto } from '../dtos/update-ticket.dto';
 import { Ticket, TicketDocument } from '../schemas/ticket.schema';
 import { CreateTicketParams } from '../tickets.service';
 
@@ -22,5 +23,14 @@ export class TicketsRepository {
 
   async find(): Promise<TicketDocument[]> {
     return this.ticketModel.find();
+  }
+
+  async update(
+    id: string,
+    updateTicketDto: UpdateTicketDto,
+  ): Promise<TicketDocument> {
+    return this.ticketModel.findByIdAndUpdate(id, updateTicketDto, {
+      new: true,
+    });
   }
 }

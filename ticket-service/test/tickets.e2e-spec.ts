@@ -169,4 +169,51 @@ describe('TicketsController (e2e)', () => {
       expect(response.body[0].id).toBe(ticket._id.toString());
     });
   });
+
+  describe('PUT /tickets/:id', () => {
+    it('should return 401 when token is not provided', async () => {
+      const response = await request(app.getHttpServer())
+        .put('/tickets/any_id')
+        .send();
+
+      expect(response.status).toBe(401);
+    });
+
+    it('should return 404 when ticket not found', async () => {
+      const token = await jwtService.sign({ id: userId });
+
+      const response = await request(app.getHttpServer())
+        .put(`/tickets/${new mongoose.Types.ObjectId().toHexString()}`)
+        .send({
+          title,
+          price,
+        })
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(404);
+    });
+
+    it('should return 200 with ticket', async () => {
+      const token = await jwtService.sign({ id: userId });
+
+      const ticket = await ticketsRepository.create({
+        title,
+        price,
+        userId,
+      });
+
+      const response = await request(app.getHttpServer())
+        .put(`/tickets/${ticket._id}`)
+        .send({
+          title: `${title}_2`,
+          price: price + 1,
+        })
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.id).toBe(ticket._id.toString());
+      expect(response.body.title).toBe(`${ticket.title}_2`);
+      expect(response.body.price).toBe(ticket.price + 1);
+    });
+  });
 });

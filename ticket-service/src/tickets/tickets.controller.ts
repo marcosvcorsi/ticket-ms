@@ -4,11 +4,13 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateTicketDto } from './dtos/create-ticket.dto';
+import { UpdateTicketDto } from './dtos/update-ticket.dto';
 import { TicketsService } from './tickets.service';
 
 @UseGuards(AuthGuard('jwt'))
@@ -32,6 +34,14 @@ export class TicketsController {
   @Get(':id')
   async findById(@Param('id') id: string) {
     return this.ticketsService.findById(id);
+  }
+
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateTicketDto: UpdateTicketDto,
+  ) {
+    return this.ticketsService.update(id, updateTicketDto);
   }
 
   @Get()
