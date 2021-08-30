@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { TicketsModule } from '../src/tickets/tickets.module';
 import { MongoMemoryServer } from 'mongodb-memory-server';
@@ -116,7 +116,7 @@ describe('TicketsController (e2e)', () => {
       const token = await jwtService.sign({ id: userId });
 
       const response = await request(app.getHttpServer())
-        .get('/tickets/612c35e39eaca555a48cd08d')
+        .get(`/tickets/${new mongoose.Types.ObjectId().toHexString()}`)
         .set('cookie', `jwt=${token}`);
 
       expect(response.status).toBe(404);
@@ -139,6 +139,34 @@ describe('TicketsController (e2e)', () => {
       expect(response.body.id).toBe(ticket._id.toString());
       expect(response.body.title).toBe(ticket.title);
       expect(response.body.price).toBe(ticket.price);
+    });
+  });
+
+  describe('GET /tickets', () => {
+    it('should return 401 when token is not provided', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/tickets')
+        .send();
+
+      expect(response.status).toBe(401);
+    });
+
+    it('should return 200 with all tickets', async () => {
+      const token = await jwtService.sign({ id: userId });
+
+      const ticket = await ticketsRepository.create({
+        title,
+        price,
+        userId,
+      });
+
+      const response = await request(app.getHttpServer())
+        .get('/tickets')
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveLength(1);
+      expect(response.body[0].id).toBe(ticket._id.toString());
     });
   });
 });

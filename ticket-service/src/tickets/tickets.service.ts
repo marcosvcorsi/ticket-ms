@@ -26,4 +26,10 @@ export class TicketsService {
 
     return Ticket.fromDocument(ticketDocument);
   }
+
+  async find(): Promise<Ticket[]> {
+    const ticketDocuments = await this.ticketsRepository.find();
+
+    return ticketDocuments.map(Ticket.fromDocument);
+  }
 }

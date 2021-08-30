@@ -33,4 +33,9 @@ export class TicketsController {
   async findById(@Param('id') id: string) {
     return this.ticketsService.findById(id);
   }
+
+  @Get()
+  async find() {
+    return this.ticketsService.find();
+  }
 }
