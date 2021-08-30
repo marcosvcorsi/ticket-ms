@@ -40,8 +40,14 @@ export class TicketsController {
   async update(
     @Param('id') id: string,
     @Body() updateTicketDto: UpdateTicketDto,
+    @Request() request,
   ) {
-    return this.ticketsService.update(id, updateTicketDto);
+    const { id: userId } = request.user;
+
+    return this.ticketsService.update(id, {
+      userId,
+      ...updateTicketDto,
+    });
   }
 
   @Get()

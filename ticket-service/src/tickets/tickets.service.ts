@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateTicketDto } from './dtos/create-ticket.dto';
 import { UpdateTicketDto } from './dtos/update-ticket.dto';
 import { Ticket } from './models/ticket.model';
@@ -6,6 +10,10 @@ import { TicketsRepository } from './repositories/tickets.repository';
 import { TicketDocument } from './schemas/ticket.schema';
 
 export type CreateTicketParams = CreateTicketDto & {
+  userId: string;
+};
+
+export type UpdateTicketParams = UpdateTicketDto & {
   userId: string;
 };
 
@@ -31,12 +39,19 @@ export class TicketsService {
     return ticketDocuments.map(Ticket.fromDocument);
   }
 
-  async update(id: string, updateTicketDto: UpdateTicketDto): Promise<Ticket> {
-    await this.getTicketDocument(id);
+  async update(
+    id: string,
+    updateTicketParams: UpdateTicketParams,
+  ): Promise<Ticket> {
+    const existingTicket = await this.getTicketDocument(id);
+
+    if (existingTicket.userId !== updateTicketParams.userId) {
+      throw new ForbiddenException('You are not allowed to update this ticket');
+    }
 
     const ticketDocument = await this.ticketsRepository.update(
       id,
-      updateTicketDto,
+      updateTicketParams,
     );
 
     return Ticket.fromDocument(ticketDocument);

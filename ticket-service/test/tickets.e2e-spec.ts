@@ -193,6 +193,26 @@ describe('TicketsController (e2e)', () => {
       expect(response.status).toBe(404);
     });
 
+    it('should return 403 when ticket is not from requesting user', async () => {
+      const token = await jwtService.sign({ id: userId });
+
+      const ticket = await ticketsRepository.create({
+        title,
+        price,
+        userId: 'other_user_id',
+      });
+
+      const response = await request(app.getHttpServer())
+        .put(`/tickets/${ticket.id}`)
+        .send({
+          title,
+          price,
+        })
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(403);
+    });
+
     it('should return 200 with ticket', async () => {
       const token = await jwtService.sign({ id: userId });
 
