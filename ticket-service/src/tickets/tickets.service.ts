@@ -30,7 +30,9 @@ export class TicketsService {
   async findById(id: string): Promise<Ticket> {
     const ticketDocument = await this.getTicketDocument(id);
 
-    return Ticket.fromDocument(ticketDocument);
+    const ticket = Ticket.fromDocument(ticketDocument);
+
+    return ticket;
   }
 
   async find(): Promise<Ticket[]> {

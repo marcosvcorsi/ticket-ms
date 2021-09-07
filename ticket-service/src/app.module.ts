@@ -5,6 +5,7 @@ import { TicketsModule } from './tickets/tickets.module';
 import * as Joi from 'joi';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './shared/strategies/jwt.strategy';
+import { natsClient } from '@mvctickets/common';
 
 @Module({
   imports: [
