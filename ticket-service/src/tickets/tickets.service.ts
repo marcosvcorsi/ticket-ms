@@ -6,6 +6,7 @@ import {
 import { CreateTicketDto } from './dtos/create-ticket.dto';
 import { UpdateTicketDto } from './dtos/update-ticket.dto';
 import { TicketCreatedPublisher } from './events/ticket-created-publisher';
+import { TicketUpdatedPublisher } from './events/ticket-updated-publisher';
 import { Ticket } from './models/ticket.model';
 import { TicketsRepository } from './repositories/tickets.repository';
 import { TicketDocument } from './schemas/ticket.schema';
@@ -23,6 +24,7 @@ export class TicketsService {
   constructor(
     private readonly ticketsRepository: TicketsRepository,
     private readonly ticketCreatedPublisher: TicketCreatedPublisher,
+    private readonly ticketUpdatedPublisher: TicketUpdatedPublisher,
   ) {}
 
   async create(createTicketDto: CreateTicketParams): Promise<Ticket> {
@@ -64,7 +66,11 @@ export class TicketsService {
       updateTicketParams,
     );
 
-    return Ticket.fromDocument(ticketDocument);
+    const ticket = Ticket.fromDocument(ticketDocument);
+
+    await this.ticketUpdatedPublisher.publish(ticket);
+
+    return ticket;
   }
 
   private async getTicketDocument(id: string): Promise<TicketDocument> {

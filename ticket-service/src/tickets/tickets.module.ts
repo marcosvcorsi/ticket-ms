@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Ticket, TicketSchema } from './schemas/ticket.schema';
 import { TicketCreatedPublisher } from './events/ticket-created-publisher';
 import { natsClient } from '@mvctickets/common';
+import { TicketUpdatedPublisher } from './events/ticket-updated-publisher';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { natsClient } from '@mvctickets/common';
       },
     },
     TicketCreatedPublisher,
+    TicketUpdatedPublisher,
   ],
 })
 export class TicketsModule {}

@@ -11,6 +11,8 @@ import { JwtStrategy } from '../src/shared/strategies/jwt.strategy';
 import * as cookieParser from 'cookie-parser';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { TicketsRepository } from '../src/tickets/repositories/tickets.repository';
+import { TicketCreatedPublisher } from '../src/tickets/events/ticket-created-publisher';
+import { TicketUpdatedPublisher } from '../src/tickets/events/ticket-updated-publisher';
 
 describe('TicketsController (e2e)', () => {
   let mongo: MongoMemoryServer;
@@ -24,6 +26,10 @@ describe('TicketsController (e2e)', () => {
   let title: string;
   let price: number;
   let userId: string;
+
+  const publisher = {
+    publish: jest.fn(),
+  };
 
   beforeAll(async () => {
     mongo = await MongoMemoryServer.create();
@@ -52,7 +58,14 @@ describe('TicketsController (e2e)', () => {
         TicketsModule,
       ],
       providers: [JwtStrategy],
-    }).compile();
+    })
+      .overrideProvider('NATS_CLIENT')
+      .useValue({})
+      .overrideProvider(TicketCreatedPublisher)
+      .useValue(publisher)
+      .overrideProvider(TicketUpdatedPublisher)
+      .useValue(publisher)
+      .compile();
 
     app = moduleFixture.createNestApplication();
 
