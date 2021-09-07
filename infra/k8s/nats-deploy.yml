@@ -5,11 +5,11 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: nats-deploy
+      app: nats
   template:
     metadata:
       labels:
-        app: nats-deploy
+        app: nats
     spec:
       containers:
       - name: nats
@@ -36,7 +36,7 @@ metadata:
   name: nats-service
 spec:
   selector:
-    app: nats-service
+    app: nats
   ports:
   - name: client
     protocol: TCP
