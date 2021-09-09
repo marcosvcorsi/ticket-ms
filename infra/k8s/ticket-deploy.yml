@@ -15,6 +15,14 @@ spec:
       - name: ticket
         image: mvcorsi/ticket-service
         env:
+          - name: NATS_CLIENT_ID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: NATS_URL
+            value: http://nats-service:4222
+          - name: NATS_CLUSTER_ID
+            value: ticketing
           - name: MONGO_URI
             value: mongodb://ticket-mongo-service:27017/auth
           - name: JWT_SECRET
