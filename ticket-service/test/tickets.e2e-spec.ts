@@ -113,6 +113,14 @@ describe('TicketsController (e2e)', () => {
       expect(response.body.title).toBe(title);
       expect(response.body.price).toBe(price);
       expect(response.body.userId).toBe(userId);
+      expect(publisher.publish).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: expect.any(mongoose.Types.ObjectId),
+          title: response.body.title,
+          price: response.body.price,
+          userId: response.body.userId,
+        }),
+      );
     });
   });
 
@@ -247,6 +255,14 @@ describe('TicketsController (e2e)', () => {
       expect(response.body.id).toBe(ticket._id.toString());
       expect(response.body.title).toBe(`${ticket.title}_2`);
       expect(response.body.price).toBe(ticket.price + 1);
+      expect(publisher.publish).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: expect.any(mongoose.Types.ObjectId),
+          title: response.body.title,
+          price: response.body.price,
+          userId: response.body.userId,
+        }),
+      );
     });
   });
 });
