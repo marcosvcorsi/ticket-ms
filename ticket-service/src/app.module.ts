@@ -5,7 +5,6 @@ import { TicketsModule } from './tickets/tickets.module';
 import * as Joi from 'joi';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './shared/strategies/jwt.strategy';
-import { natsClient } from '@mvctickets/common';
 
 @Module({
   imports: [
@@ -14,6 +13,9 @@ import { natsClient } from '@mvctickets/common';
       validationSchema: Joi.object({
         MONGO_URI: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
+        NATS_CLUSTER_ID: Joi.string().required(),
+        NATS_CLIENT_ID: Joi.string().required(),
+        NATS_URL: Joi.string().required(),
       }),
     }),
     MongooseModule.forRootAsync({

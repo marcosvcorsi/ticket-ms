@@ -20,9 +20,9 @@ import { TicketUpdatedPublisher } from './events/ticket-updated-publisher';
       provide: 'NATS_CLIENT',
       useFactory: async () => {
         const client = await natsClient.connect({
-          clusterId: 'ticketing',
-          clientId: 'abc',
-          url: 'http://nats-service:4222',
+          clusterId: process.env.NATS_CLUSTER_ID,
+          clientId: process.env.NATS_CLIENT_ID,
+          url: process.env.NATS_URL,
         });
 
         return client;
