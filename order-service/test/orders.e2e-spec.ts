@@ -67,4 +67,34 @@ describe('OrdersController (e2e)', () => {
       expect(response.status).toBe(401);
     });
   });
+
+  describe('GET /orders/:id', () => {
+    it('should return 401 when token is not provided', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/orders/any_id')
+        .send();
+
+      expect(response.status).toBe(401);
+    });
+  });
+
+  describe('POST /orders', () => {
+    it('should return 401 when token is not provided', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send({});
+
+      expect(response.status).toBe(401);
+    });
+  });
+
+  describe('DELETE /orders/id', () => {
+    it('should return 401 when token is not provided', async () => {
+      const response = await request(app.getHttpServer())
+        .delete('/orders/any_id')
+        .send();
+
+      expect(response.status).toBe(401);
+    });
+  });
 });

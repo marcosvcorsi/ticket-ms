@@ -1,4 +1,11 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { OrdersService } from './orders.service';
 
@@ -10,5 +17,20 @@ export class OrdersController {
   @Get()
   async find() {
     return [];
+  }
+
+  @Get('/:id')
+  async findById(@Param('id') id: string) {
+    return {};
+  }
+
+  @Post()
+  async create() {
+    return {};
+  }
+
+  @Delete('/:id')
+  async delete(@Param('id') id: string) {
+    return {};
   }
 }
