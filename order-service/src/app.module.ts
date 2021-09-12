@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import * as Joi from 'joi';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './shared/strategies/jwt.strategy';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { JwtStrategy } from './shared/strategies/jwt.strategy';
     PassportModule.register({
       defaultStrategy: 'jwt',
     }),
+    OrdersModule,
   ],
   controllers: [],
   providers: [JwtStrategy],
