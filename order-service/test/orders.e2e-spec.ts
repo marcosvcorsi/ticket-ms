@@ -5,7 +5,11 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import * as mongoose from 'mongoose';
 import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from '../src/shared/strategies/jwt.strategy';
 import { OrdersModule } from '../src/orders/orders.module';
+import * as cookieParser from 'cookie-parser';
 
 describe('OrdersController (e2e)', () => {
   let mongo: MongoMemoryServer;
@@ -24,11 +28,24 @@ describe('OrdersController (e2e)', () => {
         ConfigModule.forRoot({
           envFilePath: '.env.test',
         }),
+        PassportModule.register({
+          defaultStrategy: 'jwt',
+        }),
+        JwtModule.register({
+          secret: process.env.JWT_SECRET,
+          signOptions: {
+            expiresIn: '15m',
+          },
+        }),
         OrdersModule,
       ],
+      providers: [JwtStrategy],
     }).compile();
 
     app = moduleFixture.createNestApplication();
+
+    app.use(cookieParser());
+
     await app.init();
 
     connection = await moduleFixture.get(getConnectionToken());
@@ -45,9 +62,7 @@ describe('OrdersController (e2e)', () => {
 
   describe('GET /orders', () => {
     it('should return 401 when token is not provided', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/tickets')
-        .send();
+      const response = await request(app.getHttpServer()).get('/orders').send();
 
       expect(response.status).toBe(401);
     });
