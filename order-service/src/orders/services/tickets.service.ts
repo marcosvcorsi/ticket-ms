@@ -27,6 +27,6 @@ export class TicketsService {
       [OrderStatus.Created, OrderStatus.AwaitingPayment, OrderStatus.Complete],
     );
 
-    return !!existingOrder;
+    return !existingOrder;
   }
 }

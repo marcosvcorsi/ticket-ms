@@ -6,18 +6,30 @@ import * as mongoose from 'mongoose';
 import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { JwtStrategy } from '../src/shared/strategies/jwt.strategy';
 import { OrdersModule } from '../src/orders/orders.module';
 import * as cookieParser from 'cookie-parser';
+import { TicketsRepository } from '../src/orders/repositories/tickets.repository';
+import { OrdersRepository } from '../src/orders/repositories/orders.repository';
+import { OrderStatus } from '@mvctickets/common';
 
 describe('OrdersController (e2e)', () => {
   let mongo: MongoMemoryServer;
   let connection: mongoose.Connection;
+  let jwtService: JwtService;
+  let ticketsRepository: TicketsRepository;
+  let ordersRepository: OrdersRepository;
+
+  let userId: string;
+  let ticketId: string;
 
   let app: INestApplication;
 
   beforeAll(async () => {
+    userId = 'any_user_id';
+    ticketId = new mongoose.Types.ObjectId().toHexString();
+
     mongo = await MongoMemoryServer.create();
   });
 
@@ -47,6 +59,10 @@ describe('OrdersController (e2e)', () => {
     app.use(cookieParser());
 
     await app.init();
+
+    jwtService = app.get(JwtService);
+    ticketsRepository = app.get(TicketsRepository);
+    ordersRepository = app.get(OrdersRepository);
 
     connection = await moduleFixture.get(getConnectionToken());
   });
@@ -85,6 +101,128 @@ describe('OrdersController (e2e)', () => {
         .send({});
 
       expect(response.status).toBe(401);
+    });
+
+    it('should return 404 when ticket not found', async () => {
+      const token = await jwtService.sign({ id: userId });
+
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send({
+          ticketId,
+        })
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.message).toBe(
+        `Ticket with id ${ticketId.toString()} not found`,
+      );
+    });
+
+    it('should return 400 when ticket is already reserved with an order status Created', async () => {
+      const ticket = await ticketsRepository.create({
+        price: 10,
+        title: 'any_title',
+      });
+
+      await ordersRepository.create({
+        userId,
+        status: OrderStatus.Created,
+        ticket,
+        expiresAt: new Date(),
+      });
+
+      const token = await jwtService.sign({ id: userId });
+
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send({
+          ticketId: ticket._id,
+        })
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe('Ticket is already reserved');
+    });
+
+    it('should return 400 when ticket is already reserved with an order status AwaitingPayment', async () => {
+      const ticket = await ticketsRepository.create({
+        price: 10,
+        title: 'any_title',
+      });
+
+      await ordersRepository.create({
+        userId,
+        status: OrderStatus.AwaitingPayment,
+        ticket,
+        expiresAt: new Date(),
+      });
+
+      const token = await jwtService.sign({ id: userId });
+
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send({
+          ticketId: ticket._id,
+        })
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe('Ticket is already reserved');
+    });
+
+    it('should return 400 when ticket is already reserved with an order status Complete', async () => {
+      const ticket = await ticketsRepository.create({
+        price: 10,
+        title: 'any_title',
+      });
+
+      await ordersRepository.create({
+        userId,
+        status: OrderStatus.Complete,
+        ticket,
+        expiresAt: new Date(),
+      });
+
+      const token = await jwtService.sign({ id: userId });
+
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send({
+          ticketId: ticket._id,
+        })
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe('Ticket is already reserved');
+    });
+
+    it('should return 201 with a new order', async () => {
+      const ticket = await ticketsRepository.create({
+        price: 10,
+        title: 'any_title',
+      });
+
+      const token = await jwtService.sign({ id: userId });
+
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send({
+          ticketId: ticket._id,
+        })
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(201);
+      expect(response.body).toBeDefined();
+      expect(response.body.id).toBeDefined();
+      expect(response.body.status).toBe(OrderStatus.Created);
+      expect(response.body.userId).toBe(userId);
+      expect(response.body.ticket).toEqual(
+        expect.objectContaining({
+          price: ticket.price,
+          title: ticket.title,
+        }),
+      );
     });
   });
 

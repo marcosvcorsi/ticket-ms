@@ -12,4 +12,10 @@ export class TicketsRepository {
   async findById(id: string): Promise<TicketDocument> {
     return this.ticketModel.findById(id);
   }
+
+  async create(ticketData: Ticket): Promise<TicketDocument> {
+    const ticket = new this.ticketModel(ticketData);
+
+    return ticket.save();
+  }
 }
