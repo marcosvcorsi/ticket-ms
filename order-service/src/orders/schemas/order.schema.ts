@@ -1,6 +1,6 @@
 import { OrderStatus } from '@mvctickets/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document } from 'mongoose';
+import { Document, Schema as mongooseSchema } from 'mongoose';
 import { TicketDocument } from './ticket.schema';
 
 export type OrderDocument = Order & Document;
@@ -16,7 +16,7 @@ export class Order {
   @Prop()
   expiresAt: Date;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' })
+  @Prop({ type: mongooseSchema.Types.ObjectId, ref: 'Ticket' })
   ticket: TicketDocument;
 }
 
