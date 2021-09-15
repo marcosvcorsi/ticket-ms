@@ -24,7 +24,7 @@ export class OrdersController {
 
   @Get('/:id')
   async findById(@Param('id') id: string) {
-    return {};
+    return this.ordersService.findById(id);
   }
 
   @Post()

@@ -1,5 +1,9 @@
 import { OrderStatus } from '@mvctickets/common';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Order } from '../models/order.model';
 import { OrdersRepository } from '../repositories/orders.repository';
 import { TicketsService } from './tickets.service';
@@ -40,6 +44,16 @@ export class OrdersService {
       expiresAt,
       status: OrderStatus.Created,
     });
+
+    return Order.fromDocument(orderDocument);
+  }
+
+  async findById(id: string): Promise<Order> {
+    const orderDocument = await this.ordersRepository.findById(id);
+
+    if (!orderDocument) {
+      throw new NotFoundException(`Order with id ${id} not found`);
+    }
 
     return Order.fromDocument(orderDocument);
   }

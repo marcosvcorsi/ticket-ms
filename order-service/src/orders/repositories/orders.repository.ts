@@ -28,4 +28,8 @@ export class OrdersRepository {
 
     return order.save();
   }
+
+  async findById(id: string): Promise<OrderDocument> {
+    return this.orderModel.findById(id).populate('ticket');
+  }
 }

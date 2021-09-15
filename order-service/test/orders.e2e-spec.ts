@@ -92,6 +92,47 @@ describe('OrdersController (e2e)', () => {
 
       expect(response.status).toBe(401);
     });
+
+    it('should return 404 when order not found', async () => {
+      const token = await jwtService.sign({ id: userId });
+
+      const orderId = new mongoose.Types.ObjectId().toHexString();
+
+      const response = await request(app.getHttpServer())
+        .get(`/orders/${orderId}`)
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.message).toBe(
+        `Order with id ${orderId.toString()} not found`,
+      );
+    });
+
+    it('should return 200 with order on success', async () => {
+      const token = await jwtService.sign({ id: userId });
+
+      const ticket = await ticketsRepository.create({
+        price: 10,
+        title: 'any_title',
+      });
+
+      const order = await ordersRepository.create({
+        userId,
+        status: OrderStatus.Created,
+        ticket,
+        expiresAt: new Date(),
+      });
+
+      const response = await request(app.getHttpServer())
+        .get(`/orders/${order._id}`)
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.id).toBe(order._id.toString());
+      expect(response.body.status).toBe(order.status);
+      expect(response.body.ticket.id).toBe(ticket._id.toString());
+      expect(response.body.userId).toBe(userId);
+    });
   });
 
   describe('POST /orders', () => {
