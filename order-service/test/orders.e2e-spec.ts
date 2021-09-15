@@ -142,6 +142,29 @@ describe('OrdersController (e2e)', () => {
       );
     });
 
+    it('should return 404 when order not found', async () => {
+      const anotherUserToken = await jwtService.sign({ id: 'another_user_id' });
+
+      const ticket = await ticketsRepository.create({
+        price: 10,
+        title: 'any_title',
+      });
+
+      const order = await ordersRepository.create({
+        userId,
+        status: OrderStatus.Created,
+        ticket,
+        expiresAt: new Date(),
+      });
+
+      const response = await request(app.getHttpServer())
+        .get(`/orders/${order._id}`)
+        .set('cookie', `jwt=${anotherUserToken}`);
+
+      expect(response.status).toBe(403);
+      expect(response.body.message).toBe('User cannot access this resource');
+    });
+
     it('should return 200 with order on success', async () => {
       const token = await jwtService.sign({ id: userId });
 

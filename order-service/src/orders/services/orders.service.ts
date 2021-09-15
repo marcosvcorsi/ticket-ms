@@ -1,6 +1,7 @@
 import { OrderStatus } from '@mvctickets/common';
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -48,11 +49,15 @@ export class OrdersService {
     return Order.fromDocument(orderDocument);
   }
 
-  async findById(id: string): Promise<Order> {
+  async findById(id: string, userId: string): Promise<Order> {
     const orderDocument = await this.ordersRepository.findById(id);
 
     if (!orderDocument) {
       throw new NotFoundException(`Order with id ${id} not found`);
+    }
+
+    if (orderDocument.userId !== userId) {
+      throw new ForbiddenException('User cannot access this resource');
     }
 
     return Order.fromDocument(orderDocument);

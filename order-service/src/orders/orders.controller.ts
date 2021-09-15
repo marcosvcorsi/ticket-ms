@@ -25,8 +25,10 @@ export class OrdersController {
   }
 
   @Get('/:id')
-  async findById(@Param('id') id: string) {
-    return this.ordersService.findById(id);
+  async findById(@Param('id') id: string, @Request() request) {
+    const { id: userId } = request.user;
+
+    return this.ordersService.findById(id, userId);
   }
 
   @Post()
