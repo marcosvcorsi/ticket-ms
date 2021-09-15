@@ -57,4 +57,10 @@ export class OrdersService {
 
     return Order.fromDocument(orderDocument);
   }
+
+  async find(userId: string): Promise<Order[]> {
+    const orderDocuments = await this.ordersRepository.findByUser(userId);
+
+    return orderDocuments.map(Order.fromDocument);
+  }
 }

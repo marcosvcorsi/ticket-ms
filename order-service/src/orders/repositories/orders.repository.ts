@@ -32,4 +32,12 @@ export class OrdersRepository {
   async findById(id: string): Promise<OrderDocument> {
     return this.orderModel.findById(id).populate('ticket');
   }
+
+  async findByUser(userId: string): Promise<OrderDocument[]> {
+    return this.orderModel
+      .find({
+        userId,
+      })
+      .populate('ticket');
+  }
 }

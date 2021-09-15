@@ -18,8 +18,10 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Get()
-  async find() {
-    return [];
+  async find(@Request() request) {
+    const { id: userId } = request.user;
+
+    return this.ordersService.find(userId);
   }
 
   @Get('/:id')

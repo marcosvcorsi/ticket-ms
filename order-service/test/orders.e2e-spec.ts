@@ -82,6 +82,40 @@ describe('OrdersController (e2e)', () => {
 
       expect(response.status).toBe(401);
     });
+
+    it('should return 200 with orders on success', async () => {
+      const token = await jwtService.sign({ id: userId });
+
+      const ticket = await ticketsRepository.create({
+        price: 10,
+        title: 'any_title',
+      });
+
+      const order = await ordersRepository.create({
+        userId,
+        status: OrderStatus.Created,
+        ticket,
+        expiresAt: new Date(),
+      });
+
+      await ordersRepository.create({
+        userId: 'other_user_id',
+        status: OrderStatus.Created,
+        ticket,
+        expiresAt: new Date(),
+      });
+
+      const response = await request(app.getHttpServer())
+        .get('/orders')
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body[0].id).toBe(order._id.toString());
+      expect(response.body[0].status).toBe(order.status);
+      expect(response.body[0].ticket.id).toBe(ticket._id.toString());
+      expect(response.body[0].userId).toBe(userId);
+      expect(response.body).toHaveLength(1);
+    });
   });
 
   describe('GET /orders/:id', () => {
