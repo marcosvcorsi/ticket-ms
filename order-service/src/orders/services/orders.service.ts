@@ -68,4 +68,9 @@ export class OrdersService {
 
     return orderDocuments.map(Order.fromDocument);
   }
+
+  async cancel(id: string, userId: string): Promise<void> {
+    await this.findById(id, userId);
+    await this.ordersRepository.updateStatus(id, OrderStatus.Cancelled);
+  }
 }

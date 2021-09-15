@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Request,
@@ -42,7 +44,10 @@ export class OrdersController {
   }
 
   @Delete('/:id')
-  async delete(@Param('id') id: string) {
-    return {};
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(@Param('id') id: string, @Request() request) {
+    const { id: userId } = request.user;
+
+    await this.ordersService.cancel(id, userId);
   }
 }

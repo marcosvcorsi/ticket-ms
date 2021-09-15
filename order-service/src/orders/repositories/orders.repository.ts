@@ -40,4 +40,8 @@ export class OrdersRepository {
       })
       .populate('ticket');
   }
+
+  async updateStatus(id: string, status: OrderStatus): Promise<void> {
+    await this.orderModel.updateOne({ _id: id }, { status });
+  }
 }

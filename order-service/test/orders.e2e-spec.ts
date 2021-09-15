@@ -142,7 +142,7 @@ describe('OrdersController (e2e)', () => {
       );
     });
 
-    it('should return 404 when order not found', async () => {
+    it('should return 403 when order user is not matched', async () => {
       const anotherUserToken = await jwtService.sign({ id: 'another_user_id' });
 
       const ticket = await ticketsRepository.create({
@@ -331,6 +331,69 @@ describe('OrdersController (e2e)', () => {
         .send();
 
       expect(response.status).toBe(401);
+    });
+
+    it('should return 404 when order not found', async () => {
+      const token = await jwtService.sign({ id: userId });
+
+      const orderId = new mongoose.Types.ObjectId().toHexString();
+
+      const response = await request(app.getHttpServer())
+        .delete(`/orders/${orderId}`)
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.message).toBe(
+        `Order with id ${orderId.toString()} not found`,
+      );
+    });
+
+    it('should return 403 when order user is not matched', async () => {
+      const anotherUserToken = await jwtService.sign({ id: 'another_user_id' });
+
+      const ticket = await ticketsRepository.create({
+        price: 10,
+        title: 'any_title',
+      });
+
+      const order = await ordersRepository.create({
+        userId,
+        status: OrderStatus.Created,
+        ticket,
+        expiresAt: new Date(),
+      });
+
+      const response = await request(app.getHttpServer())
+        .delete(`/orders/${order._id}`)
+        .set('cookie', `jwt=${anotherUserToken}`);
+
+      expect(response.status).toBe(403);
+      expect(response.body.message).toBe('User cannot access this resource');
+    });
+
+    it('should return 204 on success', async () => {
+      const token = await jwtService.sign({ id: userId });
+
+      const ticket = await ticketsRepository.create({
+        price: 10,
+        title: 'any_title',
+      });
+
+      const order = await ordersRepository.create({
+        userId,
+        status: OrderStatus.Created,
+        ticket,
+        expiresAt: new Date(),
+      });
+
+      const response = await request(app.getHttpServer())
+        .delete(`/orders/${order._id}`)
+        .set('cookie', `jwt=${token}`);
+
+      const updatedOrder = await ordersRepository.findById(order._id);
+
+      expect(response.status).toBe(204);
+      expect(updatedOrder.status).toBe(OrderStatus.Cancelled);
     });
   });
 });
