@@ -5,6 +5,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { OrderCancelledPublisher } from '../events/order-cancelled-publisher';
+import { OrderCreatedPublisher } from '../events/order-created-publisher';
 import { Order } from '../models/order.model';
 import { OrdersRepository } from '../repositories/orders.repository';
 import { TicketsService } from './tickets.service';
@@ -21,6 +23,8 @@ export class OrdersService {
   constructor(
     private readonly ordersRepository: OrdersRepository,
     private readonly ticketsService: TicketsService,
+    private readonly orderCreatedPublisher: OrderCreatedPublisher,
+    private readonly orderCancelledPublisher: OrderCancelledPublisher,
   ) {}
 
   async create(params: CreateOrderParams): Promise<Order> {
@@ -46,7 +50,14 @@ export class OrdersService {
       status: OrderStatus.Created,
     });
 
-    return Order.fromDocument(orderDocument);
+    const order = Order.fromDocument(orderDocument);
+
+    await this.orderCreatedPublisher.publish({
+      ...order,
+      expiresAt: order.expiresAt.toISOString(),
+    });
+
+    return order;
   }
 
   async findById(id: string, userId: string): Promise<Order> {
@@ -70,7 +81,15 @@ export class OrdersService {
   }
 
   async cancel(id: string, userId: string): Promise<void> {
-    await this.findById(id, userId);
+    const order = await this.findById(id, userId);
+
     await this.ordersRepository.updateStatus(id, OrderStatus.Cancelled);
+
+    await this.orderCancelledPublisher.publish({
+      id: order.id,
+      ticket: {
+        id: order.ticket.id,
+      },
+    });
   }
 }

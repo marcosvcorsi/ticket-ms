@@ -7,6 +7,9 @@ import { Ticket, TicketSchema } from './schemas/ticket.schema';
 import { OrdersRepository } from './repositories/orders.repository';
 import { TicketsRepository } from './repositories/tickets.repository';
 import { TicketsService } from './services/tickets.service';
+import { natsClient } from '@mvctickets/common';
+import { OrderCreatedPublisher } from './events/order-created-publisher';
+import { OrderCancelledPublisher } from './events/order-cancelled-publisher';
 
 @Module({
   imports: [
@@ -17,10 +20,24 @@ import { TicketsService } from './services/tickets.service';
   ],
   controllers: [OrdersController],
   providers: [
+    {
+      provide: 'NATS_CLIENT',
+      useFactory: async () => {
+        const client = await natsClient.connect({
+          clusterId: process.env.NATS_CLUSTER_ID,
+          clientId: process.env.NATS_CLIENT_ID,
+          url: process.env.NATS_URL,
+        });
+
+        return client;
+      },
+    },
     OrdersRepository,
     TicketsRepository,
     TicketsService,
     OrdersService,
+    OrderCreatedPublisher,
+    OrderCancelledPublisher,
   ],
 })
 export class OrdersModule {}
