@@ -13,6 +13,8 @@ import * as cookieParser from 'cookie-parser';
 import { TicketsRepository } from '../src/orders/repositories/tickets.repository';
 import { OrdersRepository } from '../src/orders/repositories/orders.repository';
 import { OrderStatus } from '@mvctickets/common';
+import { OrderCreatedPublisher } from '../src/orders/events/order-created-publisher';
+import { OrderCancelledPublisher } from '../src/orders/events/order-cancelled-publisher';
 
 describe('OrdersController (e2e)', () => {
   let mongo: MongoMemoryServer;
@@ -25,6 +27,10 @@ describe('OrdersController (e2e)', () => {
   let ticketId: string;
 
   let app: INestApplication;
+
+  const publisher = {
+    publish: jest.fn(),
+  };
 
   beforeAll(async () => {
     userId = 'any_user_id';
@@ -52,7 +58,14 @@ describe('OrdersController (e2e)', () => {
         OrdersModule,
       ],
       providers: [JwtStrategy],
-    }).compile();
+    })
+      .overrideProvider('NATS_CLIENT')
+      .useValue({})
+      .overrideProvider(OrderCreatedPublisher)
+      .useValue(publisher)
+      .overrideProvider(OrderCancelledPublisher)
+      .useValue(publisher)
+      .compile();
 
     app = moduleFixture.createNestApplication();
 
@@ -321,6 +334,19 @@ describe('OrdersController (e2e)', () => {
           title: ticket.title,
         }),
       );
+      expect(publisher.publish).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: expect.any(mongoose.Types.ObjectId),
+          status: response.body.status,
+          userId: response.body.userId,
+          ticket: expect.objectContaining({
+            id: expect.any(mongoose.Types.ObjectId),
+            price: ticket.price,
+            title: ticket.title,
+          }),
+          expiresAt: response.body.expiresAt,
+        }),
+      );
     });
   });
 
@@ -394,6 +420,14 @@ describe('OrdersController (e2e)', () => {
 
       expect(response.status).toBe(204);
       expect(updatedOrder.status).toBe(OrderStatus.Cancelled);
+      expect(publisher.publish).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: expect.any(mongoose.Types.ObjectId),
+          ticket: expect.objectContaining({
+            id: expect.any(mongoose.Types.ObjectId),
+          }),
+        }),
+      );
     });
   });
 });
