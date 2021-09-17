@@ -5,8 +5,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { OrderCancelledPublisher } from '../events/order-cancelled-publisher';
-import { OrderCreatedPublisher } from '../events/order-created-publisher';
+import { OrderCancelledPublisher } from '../events/publishers/order-cancelled-publisher';
+import { OrderCreatedPublisher } from '../events/publishers/order-created-publisher';
 import { Order } from '../models/order.model';
 import { OrdersRepository } from '../repositories/orders.repository';
 import { TicketsService } from './tickets.service';

@@ -13,8 +13,9 @@ import * as cookieParser from 'cookie-parser';
 import { TicketsRepository } from '../src/orders/repositories/tickets.repository';
 import { OrdersRepository } from '../src/orders/repositories/orders.repository';
 import { OrderStatus } from '@mvctickets/common';
-import { OrderCreatedPublisher } from '../src/orders/events/order-created-publisher';
-import { OrderCancelledPublisher } from '../src/orders/events/order-cancelled-publisher';
+import { OrderCreatedPublisher } from '../src/orders/events/publishers/order-created-publisher';
+import { OrderCancelledPublisher } from '../src/orders/events/publishers/order-cancelled-publisher';
+import { TicketCreatedListener } from '../src/orders/events/listeners/ticket-created-listener';
 
 describe('OrdersController (e2e)', () => {
   let mongo: MongoMemoryServer;
@@ -65,6 +66,8 @@ describe('OrdersController (e2e)', () => {
       .useValue(publisher)
       .overrideProvider(OrderCancelledPublisher)
       .useValue(publisher)
+      .overrideProvider(TicketCreatedListener)
+      .useValue({})
       .compile();
 
     app = moduleFixture.createNestApplication();
