@@ -8,9 +8,14 @@ import { OrdersRepository } from './repositories/orders.repository';
 import { TicketsRepository } from './repositories/tickets.repository';
 import { TicketsService } from './services/tickets.service';
 import { natsClient } from '@mvctickets/common';
-import { OrderCreatedPublisher } from './events/publishers/order-created-publisher';
-import { OrderCancelledPublisher } from './events/publishers/order-cancelled-publisher';
-import { TicketCreatedListener } from './events/listeners/ticket-created-listener';
+import {
+  OrderCreatedPublisher,
+  OrderCancelledPublisher,
+} from './events/publishers';
+import {
+  TicketCreatedListener,
+  TicketUpdatedListener,
+} from './events/listeners';
 
 @Module({
   imports: [
@@ -40,6 +45,7 @@ import { TicketCreatedListener } from './events/listeners/ticket-created-listene
     OrderCreatedPublisher,
     OrderCancelledPublisher,
     TicketCreatedListener,
+    TicketUpdatedListener,
   ],
 })
 export class OrdersModule {}

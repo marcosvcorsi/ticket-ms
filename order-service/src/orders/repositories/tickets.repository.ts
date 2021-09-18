@@ -13,9 +13,13 @@ export class TicketsRepository {
     return this.ticketModel.findById(id);
   }
 
-  async create(ticketData: Ticket): Promise<TicketDocument> {
+  async create(ticketData: Ticket & { _id?: string }): Promise<TicketDocument> {
     const ticket = new this.ticketModel(ticketData);
 
     return ticket.save();
+  }
+
+  async update(id: string, data: Ticket): Promise<void> {
+    await this.ticketModel.updateOne({ _id: id }, data);
   }
 }
