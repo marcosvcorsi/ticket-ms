@@ -34,6 +34,7 @@
     "cookie-parser": "^1.4.5",
     "joi": "^17.4.2",
     "mongoose": "^5.13.8",
+    "mongoose-update-if-current": "^1.4.0",
     "node-nats-streaming": "^0.3.2",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",

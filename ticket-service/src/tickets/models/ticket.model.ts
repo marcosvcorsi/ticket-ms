@@ -5,6 +5,7 @@ export class Ticket {
   title: string;
   price: number;
   userId: string;
+  version: number;
 
   static fromDocument(document: TicketDocument): Ticket {
     return {
@@ -12,6 +13,7 @@ export class Ticket {
       title: document.title,
       price: document.price,
       userId: document.userId,
+      version: document.version,
     };
   }
 }
