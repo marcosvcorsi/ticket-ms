@@ -19,9 +19,61 @@ import {
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: Ticket.name, schema: TicketSchema },
-      { name: Order.name, schema: OrderSchema },
+    MongooseModule.forFeatureAsync([
+      {
+        name: Ticket.name,
+        useFactory: async () => {
+          const schema = TicketSchema;
+
+          schema.set('versionKey', 'version');
+          schema.pre('update', function () {
+            const update = this.getUpdate() as any;
+            if (update.version != null) {
+              delete update.version;
+            }
+            const keys = ['$set', '$setOnInsert'];
+            for (const key of keys) {
+              if (update[key] != null && update[key].version != null) {
+                delete update[key].version;
+                if (Object.keys(update[key]).length === 0) {
+                  delete update[key];
+                }
+              }
+            }
+            update.$inc = update.$inc || {};
+            update.$inc.version = 1;
+          });
+
+          return schema;
+        },
+      },
+      {
+        name: Order.name,
+        useFactory: async () => {
+          const schema = OrderSchema;
+
+          schema.set('versionKey', 'version');
+          schema.pre('update', function () {
+            const update = this.getUpdate() as any;
+            if (update.version != null) {
+              delete update.version;
+            }
+            const keys = ['$set', '$setOnInsert'];
+            for (const key of keys) {
+              if (update[key] != null && update[key].version != null) {
+                delete update[key].version;
+                if (Object.keys(update[key]).length === 0) {
+                  delete update[key];
+                }
+              }
+            }
+            update.$inc = update.$inc || {};
+            update.$inc.version = 1;
+          });
+
+          return schema;
+        },
+      },
     ]),
   ],
   controllers: [OrdersController],

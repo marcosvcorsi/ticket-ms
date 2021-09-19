@@ -10,7 +10,9 @@ export class Order {
     id: string;
     title: string;
     price: number;
+    version: number;
   };
+  version: number;
 
   static fromDocument(document: OrderDocument): Order {
     return {
@@ -22,7 +24,9 @@ export class Order {
         id: document.ticket._id,
         title: document.ticket.title,
         price: document.ticket.price,
+        version: document.ticket.version,
       },
+      version: document.version,
     };
   }
 }

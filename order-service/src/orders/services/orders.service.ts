@@ -90,6 +90,7 @@ export class OrdersService {
       ticket: {
         id: order.ticket.id,
       },
+      version: order.version,
     });
   }
 }

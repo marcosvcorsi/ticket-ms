@@ -18,6 +18,9 @@ export class Order {
 
   @Prop({ type: mongooseSchema.Types.ObjectId, ref: 'Ticket' })
   ticket: TicketDocument;
+
+  @Prop()
+  version?: number;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

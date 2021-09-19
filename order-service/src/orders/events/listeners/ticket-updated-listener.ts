@@ -23,16 +23,19 @@ export class TicketUpdatedListener extends Listener<TicketUpdatedEvent> {
   async onMessage(data: TicketUpdatedEvent['data'], msg: Message) {
     logger.log(`Ticket updated data: ${JSON.stringify(data)}`);
 
-    const { id, title, price } = data;
+    const { id, title, price, version } = data;
 
-    const ticket = await this.ticketsRepository.findById(id);
+    const ticket = await this.ticketsRepository.findByIdAndVersion(id, version);
 
-    if (ticket) {
-      await this.ticketsRepository.update(id, { title, price });
-
-      logger.log(`Ticket updated: ${JSON.stringify({ id, title, price })}`);
-
-      msg.ack();
+    if (!ticket) {
+      logger.warn(`Ticket with id ${id} and version ${version} not found`);
+      return;
     }
+
+    await this.ticketsRepository.update(id, { title, price });
+
+    logger.log(`Ticket updated: ${JSON.stringify({ id, title, price })}`);
+
+    msg.ack();
   }
 }

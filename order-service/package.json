@@ -21,7 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@mvctickets/common": "^1.5.1",
+    "@mvctickets/common": "^1.5.2",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^1.0.1",
     "@nestjs/core": "^8.0.0",
@@ -35,6 +35,7 @@
     "cookie-parser": "^1.4.5",
     "joi": "^17.4.2",
     "mongoose": "^5.13.8",
+    "mongoose-update-if-current": "^1.4.0",
     "node-nats-streaming": "^0.3.2",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",

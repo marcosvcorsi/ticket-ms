@@ -13,6 +13,13 @@ export class TicketsRepository {
     return this.ticketModel.findById(id);
   }
 
+  async findByIdAndVersion(
+    id: string,
+    version: number,
+  ): Promise<TicketDocument> {
+    return this.ticketModel.findOne({ _id: id, version: version - 1 });
+  }
+
   async create(ticketData: Ticket & { _id?: string }): Promise<TicketDocument> {
     const ticket = new this.ticketModel(ticketData);
 
