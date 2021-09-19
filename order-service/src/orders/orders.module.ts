@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { OrdersService } from './services/orders.service';
 import { OrdersController } from './orders.controller';
 import { MongooseModule } from '@nestjs/mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import { Order, OrderSchema } from './schemas/order.schema';
 import { Ticket, TicketSchema } from './schemas/ticket.schema';
 import { OrdersRepository } from './repositories/orders.repository';
@@ -43,6 +44,7 @@ import {
             update.$inc = update.$inc || {};
             update.$inc.version = 1;
           });
+          schema.plugin(updateIfCurrentPlugin);
 
           return schema;
         },
@@ -70,6 +72,7 @@ import {
             update.$inc = update.$inc || {};
             update.$inc.version = 1;
           });
+          schema.plugin(updateIfCurrentPlugin);
 
           return schema;
         },
