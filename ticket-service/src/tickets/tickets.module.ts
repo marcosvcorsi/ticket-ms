@@ -4,9 +4,11 @@ import { TicketsController } from './tickets.controller';
 import { TicketsRepository } from './repositories/tickets.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Ticket, TicketSchema } from './schemas/ticket.schema';
-import { TicketCreatedPublisher } from './events/ticket-created-publisher';
+import {
+  TicketCreatedPublisher,
+  TicketUpdatedPublisher,
+} from './events/publishers';
 import { natsClient } from '@mvctickets/common';
-import { TicketUpdatedPublisher } from './events/ticket-updated-publisher';
 
 @Module({
   imports: [

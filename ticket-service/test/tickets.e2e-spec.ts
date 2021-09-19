@@ -11,8 +11,10 @@ import { JwtStrategy } from '../src/shared/strategies/jwt.strategy';
 import * as cookieParser from 'cookie-parser';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { TicketsRepository } from '../src/tickets/repositories/tickets.repository';
-import { TicketCreatedPublisher } from '../src/tickets/events/ticket-created-publisher';
-import { TicketUpdatedPublisher } from '../src/tickets/events/ticket-updated-publisher';
+import {
+  TicketCreatedPublisher,
+  TicketUpdatedPublisher,
+} from '../src/tickets/events/publishers';
 
 describe('TicketsController (e2e)', () => {
   let mongo: MongoMemoryServer;

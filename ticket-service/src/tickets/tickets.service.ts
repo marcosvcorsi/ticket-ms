@@ -5,8 +5,11 @@ import {
 } from '@nestjs/common';
 import { CreateTicketDto } from './dtos/create-ticket.dto';
 import { UpdateTicketDto } from './dtos/update-ticket.dto';
-import { TicketCreatedPublisher } from './events/ticket-created-publisher';
-import { TicketUpdatedPublisher } from './events/ticket-updated-publisher';
+import {
+  TicketCreatedPublisher,
+  TicketUpdatedPublisher,
+} from './events/publishers';
+
 import { Ticket } from './models/ticket.model';
 import { TicketsRepository } from './repositories/tickets.repository';
 import { TicketDocument } from './schemas/ticket.schema';
