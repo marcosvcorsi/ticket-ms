@@ -3,6 +3,7 @@ import { TicketsService } from './tickets.service';
 import { TicketsController } from './tickets.controller';
 import { TicketsRepository } from './repositories/tickets.repository';
 import { MongooseModule } from '@nestjs/mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import { Ticket, TicketSchema } from './schemas/ticket.schema';
 import {
   TicketCreatedPublisher,
@@ -36,6 +37,7 @@ import { natsClient } from '@mvctickets/common';
             update.$inc = update.$inc || {};
             update.$inc.version = 1;
           });
+          schema.plugin(updateIfCurrentPlugin);
 
           return TicketSchema;
         },
