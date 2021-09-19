@@ -12,7 +12,35 @@ import { natsClient } from '@mvctickets/common';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Ticket.name, schema: TicketSchema }]),
+    MongooseModule.forFeatureAsync([
+      {
+        name: Ticket.name,
+        useFactory: async () => {
+          const schema = TicketSchema;
+
+          schema.set('versionKey', 'version');
+          schema.pre('findOneAndUpdate', function () {
+            const update = this.getUpdate() as any;
+            if (update.version != null) {
+              delete update.version;
+            }
+            const keys = ['$set', '$setOnInsert'];
+            for (const key of keys) {
+              if (update[key] != null && update[key].version != null) {
+                delete update[key].version;
+                if (Object.keys(update[key]).length === 0) {
+                  delete update[key];
+                }
+              }
+            }
+            update.$inc = update.$inc || {};
+            update.$inc.version = 1;
+          });
+
+          return TicketSchema;
+        },
+      },
+    ]),
   ],
   controllers: [TicketsController],
   providers: [

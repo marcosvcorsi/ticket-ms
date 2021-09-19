@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 export type TicketDocument = Ticket & Document;
 
@@ -16,9 +15,7 @@ export class Ticket {
   userId: string;
 
   @Prop()
-  version: number;
+  version?: number;
 }
 
-export const TicketSchema = SchemaFactory.createForClass(Ticket)
-  .set('versionKey', 'version')
-  .plugin(updateIfCurrentPlugin);
+export const TicketSchema = SchemaFactory.createForClass(Ticket);
