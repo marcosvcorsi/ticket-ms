@@ -41,7 +41,7 @@ export class OrdersRepository {
       .populate('ticket');
   }
 
-  async updateStatus(id: string, status: OrderStatus): Promise<void> {
-    await this.orderModel.updateOne({ _id: id }, { status });
+  async updateStatus(id: string, status: OrderStatus): Promise<OrderDocument> {
+    return this.orderModel.findByIdAndUpdate(id, { status }, { new: true });
   }
 }

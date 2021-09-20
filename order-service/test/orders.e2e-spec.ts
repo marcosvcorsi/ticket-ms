@@ -15,7 +15,10 @@ import { OrdersRepository } from '../src/orders/repositories/orders.repository';
 import { OrderStatus } from '@mvctickets/common';
 import { OrderCreatedPublisher } from '../src/orders/events/publishers/order-created-publisher';
 import { OrderCancelledPublisher } from '../src/orders/events/publishers/order-cancelled-publisher';
-import { TicketCreatedListener } from '../src/orders/events/listeners/ticket-created-listener';
+import {
+  TicketCreatedListener,
+  TicketUpdatedListener,
+} from '../src/orders/events/listeners';
 
 describe('OrdersController (e2e)', () => {
   let mongo: MongoMemoryServer;
@@ -67,6 +70,8 @@ describe('OrdersController (e2e)', () => {
       .overrideProvider(OrderCancelledPublisher)
       .useValue(publisher)
       .overrideProvider(TicketCreatedListener)
+      .useValue({})
+      .overrideProvider(TicketUpdatedListener)
       .useValue({})
       .compile();
 
@@ -348,6 +353,7 @@ describe('OrdersController (e2e)', () => {
             title: ticket.title,
           }),
           expiresAt: response.body.expiresAt,
+          version: response.body.version,
         }),
       );
     });
@@ -429,6 +435,7 @@ describe('OrdersController (e2e)', () => {
           ticket: expect.objectContaining({
             id: expect.any(mongoose.Types.ObjectId),
           }),
+          version: updatedOrder.version,
         }),
       );
     });
