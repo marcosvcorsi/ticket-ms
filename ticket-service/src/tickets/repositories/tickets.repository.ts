@@ -25,11 +25,8 @@ export class TicketsRepository {
     return this.ticketModel.find();
   }
 
-  async update(
-    id: string,
-    updateTicketDto: UpdateTicketDto,
-  ): Promise<TicketDocument> {
-    return this.ticketModel.findByIdAndUpdate(id, updateTicketDto, {
+  async update(id: string, data: Partial<Ticket>): Promise<TicketDocument> {
+    return this.ticketModel.findByIdAndUpdate(id, data, {
       new: true,
     });
   }

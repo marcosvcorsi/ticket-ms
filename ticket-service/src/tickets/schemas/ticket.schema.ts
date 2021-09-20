@@ -16,6 +16,9 @@ export class Ticket {
 
   @Prop()
   version?: number;
+
+  @Prop()
+  orderId?: string;
 }
 
 export const TicketSchema = SchemaFactory.createForClass(Ticket);
