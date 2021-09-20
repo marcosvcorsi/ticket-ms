@@ -26,7 +26,12 @@ export class TicketsRepository {
     return ticket.save();
   }
 
-  async update(id: string, data: Ticket): Promise<void> {
-    await this.ticketModel.updateOne({ _id: id }, data);
+  async update(
+    id: string,
+    data: Pick<Ticket, 'title' | 'price'>,
+  ): Promise<Ticket> {
+    return this.ticketModel.findByIdAndUpdate(id, data, {
+      new: true,
+    });
   }
 }

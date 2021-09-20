@@ -27,7 +27,7 @@ import {
           const schema = TicketSchema;
 
           schema.set('versionKey', 'version');
-          schema.pre('update', function () {
+          schema.pre('findOneAndUpdate', function () {
             const update = this.getUpdate() as any;
             if (update.version != null) {
               delete update.version;
@@ -55,7 +55,7 @@ import {
           const schema = OrderSchema;
 
           schema.set('versionKey', 'version');
-          schema.pre('update', function () {
+          schema.pre('findOneAndUpdate', function () {
             const update = this.getUpdate() as any;
             if (update.version != null) {
               delete update.version;

@@ -25,6 +25,12 @@ export class TicketUpdatedListener extends Listener<TicketUpdatedEvent> {
 
     const { id, title, price, version } = data;
 
+    logger.log(
+      `Ticket values ${JSON.stringify(
+        await this.ticketsRepository.findById(id),
+      )}`,
+    );
+
     const ticket = await this.ticketsRepository.findByIdAndVersion(id, version);
 
     if (!ticket) {
@@ -34,7 +40,9 @@ export class TicketUpdatedListener extends Listener<TicketUpdatedEvent> {
 
     await this.ticketsRepository.update(id, { title, price });
 
-    logger.log(`Ticket updated: ${JSON.stringify({ id, title, price })}`);
+    logger.log(
+      `Ticket updated: ${JSON.stringify({ id, title, price, version })}`,
+    );
 
     msg.ack();
   }
