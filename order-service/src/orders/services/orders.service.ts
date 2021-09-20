@@ -83,14 +83,17 @@ export class OrdersService {
   async cancel(id: string, userId: string): Promise<void> {
     const order = await this.findById(id, userId);
 
-    await this.ordersRepository.updateStatus(id, OrderStatus.Cancelled);
+    const updatedOrder = await this.ordersRepository.updateStatus(
+      id,
+      OrderStatus.Cancelled,
+    );
 
     await this.orderCancelledPublisher.publish({
       id: order.id,
       ticket: {
         id: order.ticket.id,
       },
-      version: order.version,
+      version: updatedOrder.version,
     });
   }
 }

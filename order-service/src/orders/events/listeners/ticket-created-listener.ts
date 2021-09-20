@@ -1,7 +1,7 @@
 import { Listener, Subjects, TicketCreatedEvent } from '@mvctickets/common';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Message, Stan } from 'node-nats-streaming';
-import { TicketsRepository } from 'src/orders/repositories/tickets.repository';
+import { TicketsRepository } from '../../repositories/tickets.repository';
 import { QUEUE_GROUP_NAME } from './index';
 
 const logger = new Logger('TicketCreatedListener');
