@@ -12,6 +12,9 @@ export class Ticket {
   price: number;
 
   @Prop()
+  orderId?: string;
+
+  @Prop()
   version?: number;
 }
 
