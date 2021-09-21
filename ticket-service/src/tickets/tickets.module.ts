@@ -10,7 +10,10 @@ import {
   TicketUpdatedPublisher,
 } from './events/publishers';
 import { natsClient } from '@mvctickets/common';
-import { OrderCreatedListener } from './events/listeners';
+import {
+  OrderCancelledListener,
+  OrderCreatedListener,
+} from './events/listeners';
 
 @Module({
   imports: [
@@ -64,6 +67,7 @@ import { OrderCreatedListener } from './events/listeners';
     TicketCreatedPublisher,
     TicketUpdatedPublisher,
     OrderCreatedListener,
+    OrderCancelledListener,
   ],
 })
 export class TicketsModule {}
