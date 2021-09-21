@@ -32,6 +32,14 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
+    - image: mvcorsi/expiration-service
+      context: expiration-service
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
     - image: mvcorsi/web
       context: web
       docker:
