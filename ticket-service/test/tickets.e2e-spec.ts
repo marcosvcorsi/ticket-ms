@@ -15,6 +15,10 @@ import {
   TicketCreatedPublisher,
   TicketUpdatedPublisher,
 } from '../src/tickets/events/publishers';
+import {
+  OrderCancelledListener,
+  OrderCreatedListener,
+} from '../src/tickets/events/listeners';
 
 describe('TicketsController (e2e)', () => {
   let mongo: MongoMemoryServer;
@@ -67,6 +71,11 @@ describe('TicketsController (e2e)', () => {
       .useValue(publisher)
       .overrideProvider(TicketUpdatedPublisher)
       .useValue(publisher)
+      .overrideProvider(OrderCreatedListener)
+      .useValue({})
+      .overrideProvider(OrderCancelledListener)
+      .useValue({})
+
       .compile();
 
     app = moduleFixture.createNestApplication();
@@ -223,6 +232,27 @@ describe('TicketsController (e2e)', () => {
         title,
         price,
         userId: 'other_user_id',
+      });
+
+      const response = await request(app.getHttpServer())
+        .put(`/tickets/${ticket.id}`)
+        .send({
+          title,
+          price,
+        })
+        .set('cookie', `jwt=${token}`);
+
+      expect(response.status).toBe(403);
+    });
+
+    it('should return 403 when ticket is reserved', async () => {
+      const token = await jwtService.sign({ id: userId });
+
+      const ticket = await ticketsRepository.create({
+        title,
+        price,
+        userId: 'other_user_id',
+        orderId: 'any_orderId',
       });
 
       const response = await request(app.getHttpServer())

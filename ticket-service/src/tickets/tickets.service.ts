@@ -60,7 +60,10 @@ export class TicketsService {
   ): Promise<Ticket> {
     const existingTicket = await this.getTicketDocument(id);
 
-    if (existingTicket.userId !== updateTicketParams.userId) {
+    if (
+      existingTicket.userId !== updateTicketParams.userId ||
+      existingTicket.orderId
+    ) {
       throw new ForbiddenException('You are not allowed to update this ticket');
     }
 

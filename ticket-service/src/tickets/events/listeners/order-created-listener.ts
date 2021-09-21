@@ -1,7 +1,7 @@
 import { Listener, OrderCreatedEvent, Subjects } from '@mvctickets/common';
 import { Inject, Logger } from '@nestjs/common';
 import { Message, Stan } from 'node-nats-streaming';
-import { Ticket } from 'src/tickets/models/ticket.model';
+import { Ticket } from '../../models/ticket.model';
 import { TicketsRepository } from '../../repositories/tickets.repository';
 import { TicketUpdatedPublisher } from '../publishers';
 import { QUEUE_GROUP_NAME } from './index';
