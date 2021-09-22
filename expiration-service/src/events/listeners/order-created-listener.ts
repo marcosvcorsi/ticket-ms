@@ -1,7 +1,7 @@
 import { Listener, OrderCreatedEvent, Subjects } from "@mvctickets/common";
 import { Message } from "node-nats-streaming";
 import { expirationQueue } from "../../queues/expiration-queue";
-import { QUEUE_GROUP_NAME } from "./index";
+import { QUEUE_GROUP_NAME } from "../index";
 
 export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
   readonly subject = Subjects.OrderCreated;
@@ -11,7 +11,7 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
     console.log("Order created data: ", JSON.stringify(data));
     
     const orderId = data.id;
-    const delay = new Date(data.expiresAt).getTime() - new Date().getTime();
+    const delay = 1000 // new Date(data.expiresAt).getTime() - new Date().getTime();
 
     console.log("Waiting this many milliseconds to process the job: ", delay);
 

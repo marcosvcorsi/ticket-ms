@@ -1,4 +1,6 @@
+import { natsClient } from '@mvctickets/common';
 import Queue from 'bull';
+import { ExpirationCompletePublisher } from '../events/publishers';
 
 type OrderExpirationPayload = {
   orderId: string;
@@ -11,7 +13,12 @@ const expirationQueue = new Queue<OrderExpirationPayload>('order:expiration', {
 });
 
 expirationQueue.process(async (job) => {
-  console.log(`Expiring order ${job.data.orderId}`);
+  const { orderId } = job.data;
+
+  console.log(`Expiring order ${orderId}`);
+
+  const expirationCompletePublisher = new ExpirationCompletePublisher(natsClient.client);
+  expirationCompletePublisher.publish({ orderId });
 })
 
 export { expirationQueue };
