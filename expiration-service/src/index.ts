@@ -1,4 +1,5 @@
 import { natsClient } from "@mvctickets/common";
+import { OrderCreatedListener } from "./events/listeners/order-created-listener";
 
 const start = async () => {
   if (!process.env.NATS_CLIENT_ID) {
@@ -27,6 +28,9 @@ const start = async () => {
     
     process.on('SIGINT', () => natsClient.client.close());
     process.on('SIGTERM', () => natsClient.client.close());
+
+    const orderCreatedListener = new OrderCreatedListener(natsClient.client);
+    orderCreatedListener.listen();
   } catch(error) {
     console.error(error); 
   }
