@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@mvctickets/common": "^1.5.3",
+    "@mvctickets/common": "^1.6.0",
     "bull": "^3.29.2",
     "node-nats-streaming": "^0.3.2"
   },
