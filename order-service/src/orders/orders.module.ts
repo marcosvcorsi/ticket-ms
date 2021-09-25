@@ -14,6 +14,7 @@ import {
   OrderCancelledPublisher,
 } from './events/publishers';
 import {
+  ExpirationCompleteListener,
   TicketCreatedListener,
   TicketUpdatedListener,
 } from './events/listeners';
@@ -101,6 +102,7 @@ import {
     OrderCancelledPublisher,
     TicketCreatedListener,
     TicketUpdatedListener,
+    ExpirationCompleteListener,
   ],
 })
 export class OrdersModule {}
