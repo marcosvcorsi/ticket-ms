@@ -8,6 +8,8 @@ import {
   OrderCancelledListener,
   OrderCreatedListener,
 } from './events/listeners';
+import { natsClient } from '@mvctickets/common';
+import { OrdersRepository } from './repositories/orders.repository';
 
 @Module({
   imports: [
@@ -43,6 +45,23 @@ import {
     ]),
   ],
   controllers: [PaymentsController],
-  providers: [PaymentsService, OrderCreatedListener, OrderCancelledListener],
+  providers: [
+    {
+      provide: 'NATS_CLIENT',
+      useFactory: async () => {
+        const client = await natsClient.connect({
+          clusterId: process.env.NATS_CLUSTER_ID,
+          clientId: process.env.NATS_CLIENT_ID,
+          url: process.env.NATS_URL,
+        });
+
+        return client;
+      },
+    },
+    OrdersRepository,
+    PaymentsService,
+    OrderCreatedListener,
+    OrderCancelledListener,
+  ],
 })
 export class PaymentsModule {}
