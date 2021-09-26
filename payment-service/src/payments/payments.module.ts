@@ -4,6 +4,7 @@ import { PaymentsController } from './payments.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Order, OrderSchema } from './schemas/order.schema';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+import { OrderCreatedListener } from './events/listeners';
 
 @Module({
   imports: [
@@ -39,6 +40,6 @@ import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
     ]),
   ],
   controllers: [PaymentsController],
-  providers: [PaymentsService],
+  providers: [PaymentsService, OrderCreatedListener],
 })
 export class PaymentsModule {}
