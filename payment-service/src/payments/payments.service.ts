@@ -6,17 +6,21 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreatePaymentDto } from './dtos/create-payment.dto';
+import { StripeGateway } from './gateways/stripe.gateway';
 import { OrdersRepository } from './repositories/orders.repository';
 
 @Injectable()
 export class PaymentsService {
-  constructor(private readonly ordersRepository: OrdersRepository) {}
+  constructor(
+    private readonly ordersRepository: OrdersRepository,
+    private readonly stripeGateway: StripeGateway,
+  ) {}
 
   async create(
     createPaymentDto: CreatePaymentDto,
     userId: string,
-  ): Promise<string> {
-    const { orderId } = createPaymentDto;
+  ): Promise<void> {
+    const { orderId, token } = createPaymentDto;
 
     const order = await this.ordersRepository.findById(orderId);
 
@@ -32,6 +36,6 @@ export class PaymentsService {
       throw new BadRequestException("You can't pay for a cancelled order");
     }
 
-    return 'OK';
+    await this.stripeGateway.charge(token, order.price * 100);
   }
 }

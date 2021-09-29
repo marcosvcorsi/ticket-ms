@@ -10,6 +10,7 @@ import {
 } from './events/listeners';
 import { natsClient } from '@mvctickets/common';
 import { OrdersRepository } from './repositories/orders.repository';
+import { StripeGateway } from './gateways/stripe.gateway';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { OrdersRepository } from './repositories/orders.repository';
         return client;
       },
     },
+    StripeGateway,
     OrdersRepository,
     PaymentsService,
     OrderCreatedListener,
