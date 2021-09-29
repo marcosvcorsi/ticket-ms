@@ -6,7 +6,7 @@ import {
 } from '@mvctickets/common';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Message, Stan } from 'node-nats-streaming';
-import { OrdersRepository } from 'src/payments/repositories/orders.repository';
+import { OrdersRepository } from '../../repositories/orders.repository';
 import { QUEUE_GROUP_NAME } from '..';
 
 const logger = new Logger('OrderCancelledListener');
