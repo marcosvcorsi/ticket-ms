@@ -17,6 +17,7 @@ import {
 } from '../src/payments/events/listeners';
 import { OrderStatus } from '@mvctickets/common';
 import { StripeGateway } from '../src/payments/gateways/stripe.gateway';
+import { PaymentCreatedPublisher } from '../src/payments/events/publishers';
 
 describe('PaymentsController (e2e)', () => {
   let mongo: MongoMemoryServer;
@@ -33,6 +34,10 @@ describe('PaymentsController (e2e)', () => {
 
   const stripeGateway = {
     charge: jest.fn(),
+  };
+
+  const publisher = {
+    publish: jest.fn(),
   };
 
   beforeAll(async () => {
@@ -74,6 +79,8 @@ describe('PaymentsController (e2e)', () => {
       .useValue({})
       .overrideProvider(StripeGateway)
       .useValue(stripeGateway)
+      .overrideProvider(PaymentCreatedPublisher)
+      .useValue(publisher)
       .compile();
 
     app = moduleFixture.createNestApplication();
@@ -167,7 +174,7 @@ describe('PaymentsController (e2e)', () => {
       expect(response.body.message).toBe("You can't pay for a cancelled order");
     });
 
-    it('should return 204 on success', async () => {
+    it('should return 201 with payment on success', async () => {
       const order = await ordersRepository.create({
         _id: orderId,
         userId,
@@ -186,6 +193,16 @@ describe('PaymentsController (e2e)', () => {
         .set('cookie', `jwt=${jwt}`);
 
       expect(stripeGateway.charge).toHaveBeenCalledWith(token, order.price);
+      expect(publisher.publish).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: expect.any(mongoose.Types.ObjectId),
+          chargeId,
+          order: {
+            id: expect.any(mongoose.Types.ObjectId),
+          },
+          version: order.version,
+        }),
+      );
       expect(response.status).toBe(201);
       expect(response.body).toEqual(expect.objectContaining({ chargeId }));
     });

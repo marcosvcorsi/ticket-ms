@@ -6,10 +6,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreatePaymentDto } from './dtos/create-payment.dto';
+import { PaymentCreatedPublisher } from './events/publishers';
 import { StripeGateway } from './gateways/stripe.gateway';
+import { PaymentModel } from './model/payment.model';
 import { OrdersRepository } from './repositories/orders.repository';
 import { PaymentsRepository } from './repositories/payments.repository';
-import { Payment } from './schemas/payment.schema';
 
 @Injectable()
 export class PaymentsService {
@@ -17,12 +18,13 @@ export class PaymentsService {
     private readonly ordersRepository: OrdersRepository,
     private readonly paymentsRepository: PaymentsRepository,
     private readonly stripeGateway: StripeGateway,
+    private readonly paymentCreatedPublisher: PaymentCreatedPublisher,
   ) {}
 
   async create(
     createPaymentDto: CreatePaymentDto,
     userId: string,
-  ): Promise<Payment> {
+  ): Promise<PaymentModel> {
     const { orderId, token } = createPaymentDto;
 
     const order = await this.ordersRepository.findById(orderId);
@@ -41,10 +43,14 @@ export class PaymentsService {
 
     const charge = await this.stripeGateway.charge(token, order.price);
 
-    const payment = await this.paymentsRepository.create({
+    const paymentDocument = await this.paymentsRepository.create({
       chargeId: charge.id,
       order,
     });
+
+    const payment = PaymentModel.fromDocument(paymentDocument);
+
+    await this.paymentCreatedPublisher.publish(payment);
 
     return payment;
   }

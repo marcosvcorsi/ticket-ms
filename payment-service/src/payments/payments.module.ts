@@ -13,6 +13,7 @@ import { OrdersRepository } from './repositories/orders.repository';
 import { StripeGateway } from './gateways/stripe.gateway';
 import { Payment, PaymentSchema } from './schemas/payment.schema';
 import { PaymentsRepository } from './repositories/payments.repository';
+import { PaymentCreatedPublisher } from './events/publishers';
 
 @Module({
   imports: [
@@ -95,6 +96,7 @@ import { PaymentsRepository } from './repositories/payments.repository';
     PaymentsService,
     OrderCreatedListener,
     OrderCancelledListener,
+    PaymentCreatedPublisher,
   ],
 })
 export class PaymentsModule {}
