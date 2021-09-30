@@ -26,6 +26,7 @@ describe('PaymentsController (e2e)', () => {
 
   let userId: string;
   let orderId: string;
+  let chargeId: string;
   let token: string;
 
   let app: INestApplication;
@@ -37,7 +38,10 @@ describe('PaymentsController (e2e)', () => {
   beforeAll(async () => {
     userId = 'any_user_id';
     token = 'any_token';
+    chargeId = 'any_charge_id';
     orderId = new mongoose.Types.ObjectId().toHexString();
+
+    stripeGateway.charge.mockResolvedValue({ id: chargeId });
 
     mongo = await MongoMemoryServer.create();
   });
@@ -182,7 +186,8 @@ describe('PaymentsController (e2e)', () => {
         .set('cookie', `jwt=${jwt}`);
 
       expect(stripeGateway.charge).toHaveBeenCalledWith(token, order.price);
-      expect(response.status).toBe(204);
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual(expect.objectContaining({ chargeId }));
     });
   });
 });

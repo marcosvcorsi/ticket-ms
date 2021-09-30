@@ -11,6 +11,8 @@ import {
 import { natsClient } from '@mvctickets/common';
 import { OrdersRepository } from './repositories/orders.repository';
 import { StripeGateway } from './gateways/stripe.gateway';
+import { Payment, PaymentSchema } from './schemas/payment.schema';
+import { PaymentsRepository } from './repositories/payments.repository';
 
 @Module({
   imports: [
@@ -19,6 +21,34 @@ import { StripeGateway } from './gateways/stripe.gateway';
         name: Order.name,
         useFactory: async () => {
           const schema = OrderSchema;
+
+          schema.set('versionKey', 'version');
+          schema.pre('findOneAndUpdate', function () {
+            const update = this.getUpdate() as any;
+            if (update.version != null) {
+              delete update.version;
+            }
+            const keys = ['$set', '$setOnInsert'];
+            for (const key of keys) {
+              if (update[key] != null && update[key].version != null) {
+                delete update[key].version;
+                if (Object.keys(update[key]).length === 0) {
+                  delete update[key];
+                }
+              }
+            }
+            update.$inc = update.$inc || {};
+            update.$inc.version = 1;
+          });
+          schema.plugin(updateIfCurrentPlugin);
+
+          return schema;
+        },
+      },
+      {
+        name: Payment.name,
+        useFactory: async () => {
+          const schema = PaymentSchema;
 
           schema.set('versionKey', 'version');
           schema.pre('findOneAndUpdate', function () {
@@ -61,6 +91,7 @@ import { StripeGateway } from './gateways/stripe.gateway';
     },
     StripeGateway,
     OrdersRepository,
+    PaymentsRepository,
     PaymentsService,
     OrderCreatedListener,
     OrderCancelledListener,
