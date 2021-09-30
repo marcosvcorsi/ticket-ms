@@ -13,7 +13,7 @@ export class StripeGateway {
 
   async charge(source: string, amount: number) {
     return this.client.charges.create({
-      amount,
+      amount: amount * 100,
       source,
       currency: 'usd',
     });

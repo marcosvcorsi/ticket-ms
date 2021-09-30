@@ -36,6 +36,6 @@ export class PaymentsService {
       throw new BadRequestException("You can't pay for a cancelled order");
     }
 
-    await this.stripeGateway.charge(token, order.price * 100);
+    await this.stripeGateway.charge(token, order.price);
   }
 }

@@ -162,5 +162,27 @@ describe('PaymentsController (e2e)', () => {
       expect(response.status).toBe(400);
       expect(response.body.message).toBe("You can't pay for a cancelled order");
     });
+
+    it('should return 204 on success', async () => {
+      const order = await ordersRepository.create({
+        _id: orderId,
+        userId,
+        status: OrderStatus.Created,
+        price: 10,
+      });
+
+      const jwt = await jwtService.sign({ id: userId });
+
+      const response = await request(app.getHttpServer())
+        .post('/payments')
+        .send({
+          orderId,
+          token,
+        })
+        .set('cookie', `jwt=${jwt}`);
+
+      expect(stripeGateway.charge).toHaveBeenCalledWith(token, order.price);
+      expect(response.status).toBe(204);
+    });
   });
 });
