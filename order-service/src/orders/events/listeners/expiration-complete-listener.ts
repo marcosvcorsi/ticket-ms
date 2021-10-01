@@ -6,7 +6,7 @@ import {
 } from '@mvctickets/common';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Message, Stan } from 'node-nats-streaming';
-import { OrdersRepository } from 'src/orders/repositories/orders.repository';
+import { OrdersRepository } from '../../repositories/orders.repository';
 import { QUEUE_GROUP_NAME } from '..';
 import { OrderCancelledPublisher } from '../publishers';
 
@@ -36,6 +36,12 @@ export class ExpirationCompleteListener extends Listener<ExpirationCompleteEvent
 
     if (!order) {
       logger.warn(`Order with id ${orderId} not found`);
+      return;
+    }
+
+    if (order.status === OrderStatus.Complete) {
+      logger.warn(`Order with id ${orderId} is completed`);
+      msg.ack();
       return;
     }
 

@@ -18,6 +18,8 @@ import { OrderCancelledPublisher } from '../src/orders/events/publishers/order-c
 import {
   TicketCreatedListener,
   TicketUpdatedListener,
+  PaymentCreatedListener,
+  ExpirationCompleteListener,
 } from '../src/orders/events/listeners';
 
 describe('OrdersController (e2e)', () => {
@@ -72,6 +74,10 @@ describe('OrdersController (e2e)', () => {
       .overrideProvider(TicketCreatedListener)
       .useValue({})
       .overrideProvider(TicketUpdatedListener)
+      .useValue({})
+      .overrideProvider(PaymentCreatedListener)
+      .useValue({})
+      .overrideProvider(ExpirationCompleteListener)
       .useValue({})
       .compile();
 
