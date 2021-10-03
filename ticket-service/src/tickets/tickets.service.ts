@@ -49,7 +49,7 @@ export class TicketsService {
   }
 
   async find(): Promise<Ticket[]> {
-    const ticketDocuments = await this.ticketsRepository.find();
+    const ticketDocuments = await this.ticketsRepository.findAvailable();
 
     return ticketDocuments.map(Ticket.fromDocument);
   }

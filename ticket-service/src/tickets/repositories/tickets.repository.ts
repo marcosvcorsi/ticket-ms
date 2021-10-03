@@ -23,6 +23,12 @@ export class TicketsRepository {
     return this.ticketModel.find();
   }
 
+  async findAvailable(): Promise<TicketDocument[]> {
+    return this.ticketModel.find({
+      orderId: undefined,
+    });
+  }
+
   async update(id: string, data: Partial<Ticket>): Promise<TicketDocument> {
     return this.ticketModel.findByIdAndUpdate(id, data, {
       new: true,
