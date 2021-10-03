@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export const LandingPage = ({ currentUser, tickets }) => {
   return (
     <div>
@@ -8,6 +10,7 @@ export const LandingPage = ({ currentUser, tickets }) => {
           <tr>
             <th>Title</th>
             <th>Price</th>
+            <th>Link</th>
           </tr>
         </thead>
         <tbody>
@@ -15,6 +18,11 @@ export const LandingPage = ({ currentUser, tickets }) => {
             <tr key={ticket.id}>
               <td>{ticket.title}</td>
               <td>{ticket.price}</td>
+              <td>
+                <Link href="/tickets/[ticketId]" as={`/tickets/${ticket.id}`}>
+                  <a>View</a>
+                </Link>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -24,9 +32,13 @@ export const LandingPage = ({ currentUser, tickets }) => {
 }
 
 LandingPage.getInitialProps = async (context, client, currentUser) => {
-  const { data } = await client.get('/api/tickets');
-  
-  return { tickets: data };
+  return client.get('/api/tickets')
+    .then(({ data }) => ({ tickets: data }))
+    .catch(error => {
+      console.error(error);
+
+      return { tickets: [] };
+    });
 }
 
 export default LandingPage;

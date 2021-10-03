@@ -16,7 +16,13 @@ export default function useRequest() {
 
       return data;
     } catch (error) {
-      setErrors(error.response.data.message);
+      const { message } = error.response.data;
+
+      if(Array.isArray(message)) {
+        setErrors(message);
+      } else {
+        setErrors([message]);
+      }
     }
   }
 
