@@ -13,11 +13,11 @@ import { CreateTicketDto } from './dtos/create-ticket.dto';
 import { UpdateTicketDto } from './dtos/update-ticket.dto';
 import { TicketsService } from './tickets.service';
 
-@UseGuards(AuthGuard('jwt'))
 @Controller('tickets')
 export class TicketsController {
   constructor(private readonly ticketsService: TicketsService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   async createTicket(
     @Body() createTicketDto: CreateTicketDto,
@@ -36,6 +36,7 @@ export class TicketsController {
     return this.ticketsService.findById(id);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   async update(
     @Param('id') id: string,

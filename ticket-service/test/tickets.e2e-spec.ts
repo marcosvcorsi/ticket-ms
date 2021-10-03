@@ -136,14 +136,6 @@ describe('TicketsController (e2e)', () => {
   });
 
   describe('GET /tickets/:id', () => {
-    it('should return 401 when token is not provided', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/tickets/any_id')
-        .send();
-
-      expect(response.status).toBe(401);
-    });
-
     it('should return 404 when ticket not found', async () => {
       const token = await jwtService.sign({ id: userId });
 
@@ -175,14 +167,6 @@ describe('TicketsController (e2e)', () => {
   });
 
   describe('GET /tickets', () => {
-    it('should return 401 when token is not provided', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/tickets')
-        .send();
-
-      expect(response.status).toBe(401);
-    });
-
     it('should return 200 with all tickets', async () => {
       const token = await jwtService.sign({ id: userId });
 
