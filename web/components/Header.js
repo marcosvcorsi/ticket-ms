@@ -5,6 +5,14 @@ const Header = ({ currentUser }) => {
 
   if (currentUser) {
     links.push({
+      label: 'Sell Tickets',
+      href: '/tickets/new'
+    });
+    links.push({
+      label: 'My Orders',
+      href: '/orders'
+    });
+    links.push({
       label: 'Sign Out',
       href: '/auth/signout'
     });

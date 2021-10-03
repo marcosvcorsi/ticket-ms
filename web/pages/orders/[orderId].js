@@ -34,7 +34,7 @@ const OrderShow = ({ order, currentUser }) => {
     })
 
     if (data) {
-      Router.push("/");
+      Router.push("/orders");
     }
   }
 
