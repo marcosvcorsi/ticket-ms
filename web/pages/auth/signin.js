@@ -1,5 +1,6 @@
 import Router from "next/router";
 import { useState } from "react"
+import Errors from "../../components/Errors";
 import useRequest from "../../hooks/use-request";
 
 export default function SingIn() {
@@ -39,15 +40,7 @@ export default function SingIn() {
         <input type="password" className="form-control" value={password} onChange={e => setPassword(e.target.value)} />
       </div>
       
-      {errors?.length > 0 && (
-        <div className="alert alert-danger">
-          <h4>Ooops....</h4>
-          <ul className="my-0">
-          {errors.map(message => <li key="message">{message}</li>)}
-          </ul>
-
-        </div>
-      )}
+      <Errors errors={errors} />
 
       <button className="btn btn-primary" type="submit">Sign In</button>
     </form>
