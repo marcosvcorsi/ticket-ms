@@ -63,7 +63,7 @@ describe('UsersController (e2e)', () => {
   });
 
   afterEach(async () => {
-    await connection.dropCollection('users');
+    await connection.dropDatabase();
     await connection.close(true);
   });
 
