@@ -24,4 +24,13 @@ jobs:
       
       - name: Push image
         run: docker push mvcorsi/auth-service
+        
+      - name: Digital Ocean doctl install
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
       
+      - run: doctl kubernetes cluster kubeconfig save ticketing
+      
+      - name: Rollout deployment
+        run: kubectl rollout restart deployment auth-deploy
