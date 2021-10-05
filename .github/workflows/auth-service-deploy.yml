@@ -1,0 +1,21 @@
+name: auth-service-deploy
+
+on: 
+  push:
+    branches:
+      - main
+    paths:
+      - 'auth-service/**'
+      
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: cd auth-service && docker build -t mvcorsi/auth-service .
+      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_UERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - run: docker push mvcorsi/auth-service
+      
