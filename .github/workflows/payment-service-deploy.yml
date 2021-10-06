@@ -30,7 +30,7 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
       
-      - run: doctl kubernetes cluster kubeconfig save paymenting
+      - run: doctl kubernetes cluster kubeconfig save ticketing
       
       - name: Rollout deployment
         run: kubectl rollout restart deployment payment-deploy
